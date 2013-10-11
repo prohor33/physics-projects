@@ -1,4 +1,4 @@
 physics-projects
 ================
 
-This projects connected with my studying at MIPT
+This projects connected with our studying at MIPT
