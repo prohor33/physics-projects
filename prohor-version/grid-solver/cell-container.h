@@ -4,20 +4,26 @@
 #include "cell.h"
 
 class CellContainer {
+
  public:
-  CellContainer* instance() {
+
+  static CellContainer* Instance() {
     static CellContainer CellContainer_;
     return &CellContainer_;
   }
+
   vector<vector<vector<Cell> > >& cells() {
     return cells_;
   }
+
  private:
+
   CellContainer() {};
   ~CellContainer() {};
+
   vector<vector<vector<Cell> > > cells_;
 };
 
-#define CC CellContainer::instance();
+#define CELL_CONTAINER CellContainer::Instance()
 
 #endif  // _CELL_CONTAINER_H_
