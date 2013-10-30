@@ -1,9 +1,10 @@
-#include "cell.h"
-#include "main_info.h"
+#include"cell.h"
+#include"main_info.h"
 
 Cell::Cell( int speed_quantity ) {
 
   real_SPEED_CUBE = new double**[speed_quantity];
+	double* a;
 	int start;
 	int length;
   for(int i=0; i<speed_quantity; i++) {

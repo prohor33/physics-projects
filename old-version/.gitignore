@@ -20,3 +20,10 @@
 .cproject
 .settings/
 project.properties
+
+# cmake
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt

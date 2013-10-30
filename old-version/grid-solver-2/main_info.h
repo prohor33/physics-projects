@@ -19,7 +19,7 @@ public:
 	double knudsen_number;
 	double time_step;
 	int each_print;
-	double p_cut; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	double p_cut; // импульс
 	double* p;
 	double delta_p;
 	double initial_stream;

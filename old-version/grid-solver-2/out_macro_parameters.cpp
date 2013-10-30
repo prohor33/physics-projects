@@ -1,7 +1,6 @@
-#include "out_macro_parameters.h"
-#include "edge_conditions.h"
-#include "main_info.h"
-#include "main.h"
+#include"out_macro_parameters.h"
+#include"main_info.h"
+#include"main.h"
 
 OutMacroParameters* OutMacroParameters1_ = NULL;
 OutMacroParameters* OutMacroParameters2_ = NULL;
@@ -23,8 +22,6 @@ OutMacroParameters::OutMacroParameters( Cell*** Cells, int gas_index ) {
   min_temperature = 1000.0f;
 	max_mod_gas_velocity = 0.0f;
 	min_mod_gas_velocity = 1000.0f;
-  max_pressure = 0.0f;
-  min_pressure = 1000.0f;
   total_concentration_file = NULL;
 	for( int i=0; i<200; i++ )
 		gas_consuption[i] = NULL;
@@ -103,6 +100,13 @@ void OutMacroParameters::OutConcentration(void) {
 	}
   fprintf(total_concentration_file, "%f\n", total_concentration);
   fclose(file_concentration);
+
+  char file_name2[50];
+  sprintf(file_name2, "data/output/gas %i/max_and_min_conc_and_temp%i.txt", gas_index, number_of_file);  
+  file_info = fopen( file_name2, "w" );
+  fprintf( file_info, "%f\n", local_max_concentration );
+  fprintf( file_info, "%f\n", local_min_concentration );
+  fclose( file_info );
   return;
 }
 
@@ -279,6 +283,12 @@ void OutMacroParameters::OutTemperature(void) {
     min_temperature = local_min_temperature;
   fclose(file_temperature);
 
+  char file_name2[50];
+  sprintf(file_name2, "data/output/gas %i/max_and_min_conc_and_temp%i.txt", gas_index, number_of_file);  
+  file_info = fopen( file_name2, "a" );
+  fprintf( file_info, "%f\n", local_max_temperature );
+  fprintf( file_info, "%f\n", local_min_temperature );
+  fclose( file_info );
   return;
 }
 
@@ -444,11 +454,9 @@ void OutMacroParameters::OutGlobalParameters(void) {
 		file_global_info = fopen("data/output/gas 1/global_info.txt", "w");
 	else
 		file_global_info = fopen("data/output/gas 2/global_info.txt", "w");
-  fprintf(file_global_info, "%f\n%f\n%f\n%f\n%f\n%f\n%f\n%f\n",
-		min_concentration, max_concentration,
-		min_temperature, max_temperature,
-		min_mod_gas_velocity, max_mod_gas_velocity,
-		min_pressure, max_pressure );
+  fprintf(file_global_info, "%f\n%f\n%f\n%f\n%f\n%f\n", min_concentration,
+    max_concentration, min_temperature, max_temperature,
+		min_mod_gas_velocity, max_mod_gas_velocity );
   fclose(file_global_info);
   return;
 }
@@ -530,10 +538,10 @@ void OutMacroParameters::ConsuptionAreaOut( CONSUPTION_AREA* area, int num ) {
 		x = area->coord.x;
 		y = area->coord.y;
 		switch ( area->orientation  ) {
-		case EdgeCondition::EDGE_AREA::HORISONTAL:
+		case CONSUPTION_AREA::HORISONTAL:
 			x += i;
 			break;
-		case EdgeCondition::EDGE_AREA::VERTICAL:
+		case CONSUPTION_AREA::VERTICAL:
 			y += i;
 			break;
 		}
@@ -562,10 +570,10 @@ void OutMacroParameters::ConsuptionAreaOut( CONSUPTION_AREA* area, int num ) {
 				}
 			}
 			switch ( area->orientation  ) {
-			case EdgeCondition::EDGE_AREA::HORISONTAL:
+			case CONSUPTION_AREA::HORISONTAL:
 				consuption += u_y;
 				break;
-			case EdgeCondition::EDGE_AREA::VERTICAL:
+			case CONSUPTION_AREA::VERTICAL:
 				consuption += u_x;
 				break;
 			}			
@@ -576,109 +584,4 @@ void OutMacroParameters::ConsuptionAreaOut( CONSUPTION_AREA* area, int num ) {
 
   fclose( gas_consuption[num] );
 	return;
-}
-
-void OutMacroParameters::OutPressure(void) {
-  char file_name[50];
-  sprintf(file_name, "data/output/gas %i/pressure%i.txt", gas_index, number_of_file);
-  file_pressure = fopen(file_name, "w");
-  //file_temperature = fopen("temperature.txt", "w");
-	double n;
-  double u_x, u_y, u_z;
-  double pressure;
-  double local_max_pressure = 0.0f;
-  double local_min_pressure = 1000.0f;
-  int sym_size_x, sym_size_y;
-  int sym_x, sym_y;
-  switch( Grid_->FLAG_USE_SYMMETRY ) {
-  case NO_SYMMETRY:
-    sym_size_x = Grid_->size_x-1;
-    sym_size_y = Grid_->size_y-1;
-    break;
-  case QUARTER_SYMMETRY:
-    sym_size_x = Grid_->size_x/2.0f;
-    sym_size_y = Grid_->size_y/2.0f;
-    break;
-  }
-  for(int y=0; y<Grid_->size_y; y++) {
-    for(int x=0; x<Grid_->size_x; x++) {
-			if( !Cells[x][y] || Cells[x][y]->type == 9 ) {
-				fprintf(file_pressure, "%i %i %f\n", x, y, 0.0f);
-			}
-			else {
-				sym_x = x;
-				sym_y = y;
-				if( Grid_->FLAG_USE_SYMMETRY == QUARTER_SYMMETRY ) {
-					if( x > (sym_size_x-1) ) {
-						sym_x = Grid_->size_x-1-x;
-					}
-					if( y > (sym_size_y-1) ) {
-						sym_y = Grid_->size_y-1-y;
-					}
-				}
-				n = 0.0f;
-				u_x = 0.0f;
-				u_y = 0.0f;
-				u_z = 0.0f;
-				pressure = 0.0f;
-				for(int i=0; i<MainInfo_->speed_quantity; i++) {
-					for(int j=0; j<MainInfo_->speed_quantity; j++) {
-						for(int k=0; k<MainInfo_->speed_quantity; k++) {
-							if( Cells[sym_x][sym_y]->GetP(i,j,k) > MainInfo_->p_cut &&
-								MainInfo_->FLAG_use_cut_sphere ) {
-								// do nothing
-							}
-							else {
-								n += Cells[sym_x][sym_y]->real_SPEED_CUBE[i][j][k];
-
-								u_x += Cells[sym_x][sym_y]->real_SPEED_CUBE[i][j][k]*
-									Cells[sym_x][sym_y]->GetP(i)/Cells[sym_x][sym_y]->GetMolMass();
-
-								u_y += Cells[sym_x][sym_y]->real_SPEED_CUBE[i][j][k]*
-									Cells[sym_x][sym_y]->GetP(j)/Cells[sym_x][sym_y]->GetMolMass();
-
-								u_z += Cells[sym_x][sym_y]->real_SPEED_CUBE[i][j][k]*
-									Cells[sym_x][sym_y]->GetP(k)/Cells[sym_x][sym_y]->GetMolMass();
-							}
-						}
-					}
-				}
-				u_x /= n;
-				u_y /= n;
-				u_z /= n;
-				for(int i=0; i<MainInfo_->speed_quantity; i++) {
-					for(int j=0; j<MainInfo_->speed_quantity; j++) {
-						for(int k=0; k<MainInfo_->speed_quantity; k++) {
-							if( Cells[sym_x][sym_y]->GetP(i,j,k) > MainInfo_->p_cut &&
-								MainInfo_->FLAG_use_cut_sphere ) {
-								// do nothing
-							}
-							else {
-								pressure += Cells[sym_x][sym_y]->GetMolMass() *
-									( QUAD(Cells[sym_x][sym_y]->GetP(i)/Cells[sym_x][sym_y]->GetMolMass()-u_x)+
-									QUAD(Cells[sym_x][sym_y]->GetP(j)/Cells[sym_x][sym_y]->GetMolMass()-u_y)+
-									QUAD(Cells[sym_x][sym_y]->GetP(k)/Cells[sym_x][sym_y]->GetMolMass()-u_z) )*
-									Cells[sym_x][sym_y]->real_SPEED_CUBE[i][j][k];			
-							}
-						}
-					}
-				}
-				pressure;
-				// �����������
-				pressure /= 3;
-
-				fprintf(file_pressure, "%i %i %f\n", x, y, pressure);
-				if(pressure > local_max_pressure)
-					local_max_pressure = pressure;
-				if(pressure < local_min_pressure)
-					local_min_pressure = pressure;
-			}
-    }    
-	}
-  if(local_max_pressure > max_pressure)
-    max_pressure = local_max_pressure;
-  if(local_min_pressure < min_pressure)
-    min_pressure = local_min_pressure;
-  fclose(file_pressure);
-  return;
 }

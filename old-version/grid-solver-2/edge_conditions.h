@@ -1,6 +1,4 @@
-#ifndef EC_H_
-#define EC_H_
-
+#pragma once
 #include"main.h"
 #include"main_info.h"
 #include"cell.h"
@@ -48,5 +46,3 @@ public:
 
 extern EdgeCondition* EdgeCondition1_;
 extern EdgeCondition* EdgeCondition2_;
-
-#endif // EC_H_

@@ -62,7 +62,6 @@ int main() {
       OutMacroParameters1_->OutTemperature();
 			OutMacroParameters1_->VelocityOut();      
 			OutMacroParameters1_->ConsuptionOut();
-			OutMacroParameters1_->OutPressure();
       OutMacroParameters1_->OutGlobalParameters();
 
       OutMacroParameters2_->InfoOut(start, i);
@@ -70,7 +69,6 @@ int main() {
       OutMacroParameters2_->OutTemperature();
 			OutMacroParameters2_->VelocityOut();      
 			OutMacroParameters2_->ConsuptionOut();
-			OutMacroParameters2_->OutPressure();
       OutMacroParameters2_->OutGlobalParameters();
     }
     OutMacroParameters1_->PrintPercent(start, i);    

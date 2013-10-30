@@ -19,10 +19,9 @@ class OutMacroParameters {
   FILE* file_global_info;
   FILE* total_concentration_file;
 	FILE* gas_consuption[200];
-	FILE* file_pressure;
   int number_of_file;
   void OutConcentration(void);
-  void OutTemperature(void);  
+  void OutTemperature(void);
   void StreamOut(void);
 	void VelocityOut(void);
   void InfoOut(clock_t start, int main_circle);
@@ -33,7 +32,6 @@ class OutMacroParameters {
   double max_concentration, min_concentration;
   double max_temperature, min_temperature;
 	double max_mod_gas_velocity, min_mod_gas_velocity;
-	double max_pressure, min_pressure;
 	Cell*** Cells;
 	int gas_index;
 	struct CONSUPTION_AREA {
@@ -45,7 +43,6 @@ class OutMacroParameters {
 		string name;
 	};
 	void ConsuptionAreaOut( CONSUPTION_AREA* area, int num );
-	void OutPressure(void);
 	CONSUPTION_AREA** consuptions_areas;
 	int cons_areas_quantity;
 };
