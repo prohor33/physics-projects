@@ -5,9 +5,9 @@
 
 class Cell;
 
-struct Neighbor {
+struct CellNeighbor {
 
-  Neighbor(
+  CellNeighbor(
       Cell* next,
       Cell* prev,
       Cell* that
@@ -16,6 +16,7 @@ struct Neighbor {
       prev(prev),
       that(that)
   {};
+
 public:
   Cell *next;
   Cell *prev;
@@ -51,6 +52,9 @@ class Cell {
   void ComputeHalfSpeedPrevIsBorder(double dt,
       sep::Axis axis);
 
+  void ComputeHalfSpeedNextIsBorder(double dt,
+    sep::Axis axis);
+
   inline double& speed(vector<int> coord) {
     return speed_[GetIndex(coord)];
   }
@@ -81,7 +85,7 @@ class Cell {
   vector<double> speed_;
   vector<double> speed_half_;
 
-  vector<Neighbor> neighbor_;  // for x, y, z axis
+  vector<CellNeighbor> neighbor_;  // for x, y, z axis
   GasNumb gas_numb_;
   CellType type_;
 

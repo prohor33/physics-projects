@@ -177,26 +177,119 @@ void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
+    // for speed < 0 with (18.5) compute prev->speed()
+
     if (p > 0.0f) {
       // for speed > 0
 
       denominator += fabs(p / MolMass()) *
-        exp((-1.0f)*p*p/(2.0f*MolMass()*wall_T_));
+        exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
     }
     else {
       // for speed < 0
 
       neighbor_[axis].prev->speed(coord) =
-        sep::max((double)0.0, 2.0f*speed(coord) - neighbor_[axis].next->speed(coord));
+        sep::max((double)0.0, 2.0f * speed(coord) - neighbor_[axis].next->speed(coord));
 
       neighbor_[axis].prev->speed_half(coord) = speed(coord) -
         (1.0 - fabs(gamma)) / 2.0f * Limiter(axis, coord);
 
       numenator1 += fabs(p / MolMass()) *
-          neighbor_[axis].next->speed_half(coord);
+          neighbor_[axis].prev->speed_half(coord);
 
       numenator2 += fabs(p / MolMass()) *
           0.5f * (neighbor_[axis].prev->speed(coord) + speed(coord));
+    }
+
+  }
+
+
+  // for speed < 0 compute prev->speed_half() (f1/2)
+
+  // prev->speed_half() (f1/2) for speed < 0 put into (20.5)
+  // then find prev->speed_half() (f1/2) for speed > 0
+  // it's diffuse reflection
+
+  // put (20.6) into (20.5) insted of f1/2 for speed < 0
+  // in that way we find g for speed > 0
+
+  // then put g for speed > 0 into (18.3) ->
+  // obtain prev->speed() for speed > 0
+  // that allow to compute speed_half() (f3/2) for speed > 0
+  // for speed < 0 we already could compute it earlier
+
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
+
+    coord = GetCoord((int)(cii-speed_half_.begin()));
+    p = P(axis, coord);
+    gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
+    double g;
+
+    if (p > 0.0f) {
+      // for speed > 0
+
+      neighbor_[axis].prev->speed_half(coord) =
+         numenator1 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
+
+      g = numenator2 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
+
+      neighbor_[axis].prev->speed(coord) =
+        sep::max((double)0.0, 2.0f * g -
+          speed(coord));
+
+      speed_half(coord) = speed(coord) +
+        (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].next->Limiter(axis, coord);
+    } else {
+      // for speed < 0
+
+      // TODO: can we do it in the same loop??
+      speed_half(coord) = neighbor_[axis].next->speed(coord) -
+        (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].next->Limiter(axis, coord);
+    }
+
+  }
+
+}
+
+
+void Cell::ComputeHalfSpeedNextIsBorder(double dt, sep::Axis axis) {
+
+  double numenator1 = 0.0f;
+  double numenator2 = 0.0f;
+  double denominator = 0.0f;
+
+  double gamma;
+  double p;
+
+  vector<int> coord(3);
+  vector<double>::iterator cii;
+
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
+
+    coord = GetCoord((int)(cii-speed_half_.begin()));
+    p = P(axis, coord);
+    gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
+        
+    if (p > 0.0f) {
+      // for speed > 0
+
+      neighbor_[axis].next->speed(coord) = 
+        sep::max((double)0.0, 2.0f * speed(coord) - neighbor_[axis].prev->speed(coord));
+
+      speed_half(coord) = speed(coord) +
+        (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
+
+      numenator1 += fabs(p / MolMass()) *
+        speed_half(coord);
+
+      numenator2 += fabs(p / MolMass()) *
+        0.5f *(speed(coord) + neighbor_[axis].next->speed(coord));
+    }
+    else {
+      // for speed < 0
+
+      denominator += fabs(p / MolMass()) *
+              exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
     }
 
   }
@@ -207,24 +300,29 @@ void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
     coord = GetCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
+    double g;
 
     if (p > 0.0f) {
       // for speed > 0
 
-      wall_T_ =
-         numenator1 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
-
-      MainInfo_->g_speed[x][y][z] =
-        numenator2 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
-
-      neighbor_[axis].prev->speed(coord) =
-        sep::max((double)0.0, 2.0f*MainInfo_->g_speed[x][y][z] -
-          speed(coord));
-
-      speed_half(coord) = speed(coord) +
-        (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].next->Limiter(axis, coord);
+      neighbor_[axis].prev->speed_half(coord) = neighbor_[axis].prev->speed(coord) +
+        (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].prev->Limiter(axis, coord);
     }
+    else {
+      // for speed < 0
 
+      speed_half(coord) = 
+        numenator1 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_T_));
+
+      g = numenator2 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_T_));
+
+      neighbor_[axis].next->speed(coord) =
+        sep::max((double)0.0, 2.0f * g - 
+              speed(coord));
+
+      neighbor_[axis].prev->speed_half(coord) = speed(coord) -
+        (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
+    }  
   }
 
 }

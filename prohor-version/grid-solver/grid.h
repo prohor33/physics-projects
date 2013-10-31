@@ -3,20 +3,42 @@
 
 #include "cell.h"
 
+class Grid;
+
+struct GridNeighbor {
+
+  GridNeighbor(
+      Grid* next,
+      Grid* prev,
+      Grid* that
+      ) :
+      next(next),
+      prev(prev),
+      that(that)
+  {};
+
+public:
+  Grid *next;
+  Grid *prev;
+  Grid *that;
+};
+
 class Grid {
 
  public:
+  Grid() {};
+  ~Grid() {};
 
-  vector<vector<vector<Cell> > >& cells() {
+  vector<vector<vector<Cell*> > >& cells() {
     return cells_;
   }
 
  private:
 
-  Grid() {};
-  ~Grid() {};
+  vector<vector<vector<Cell*> > > cells_;
 
-  vector<vector<vector<Cell> > > cells_;
+  vector<GridNeighbor> neighbor_;  // for x, y, z axis
+
 };
 
 #endif  // _GRID_H_
