@@ -1,6 +1,5 @@
 #include "main.h"
-#include "cell-container.h"
-#include "step-maker.h"
+#include "solver.h"
 #include "parameters.h"
 
 int main(int argc, char *argv[]) {
