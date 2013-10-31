@@ -21,7 +21,7 @@ double Cell::H() const {
 
 double Cell::P(sep::Axis axis,
     vector<int> coord) const {
-  // TODO: why is speed here??
+  // TODO: why is speed here?
   return PARAMETERS->velocity_[coord[axis]];
 }
 
