@@ -29,6 +29,10 @@ class Grid {
   Grid() {};
   ~Grid() {};
 
+  void ComputeHalfSpeed(double dt, sep::Axis axis);
+
+  void ComputeSpeed();
+
   vector<vector<vector<Cell*> > >& cells() {
     return cells_;
   }

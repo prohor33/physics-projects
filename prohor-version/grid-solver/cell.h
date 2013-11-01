@@ -72,7 +72,7 @@ class Cell {
   inline double Limiter(sep::Axis axis,
       vector<int> coord);
 
-  inline vector<int> GetCoord(int index);
+  inline vector<int> GetSpeedCoord(int index);
 
   int GetIndex(vector<int> coord);
 

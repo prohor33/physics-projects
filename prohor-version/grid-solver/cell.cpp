@@ -69,7 +69,7 @@ double Cell::Limiter(sep::Axis axis,
   return 0;
 }
 
-vector<int> Cell::GetCoord(int index) {
+vector<int> Cell::GetSpeedCoord(int index) {
   // TODO: return real 3d coordinates
 
   vector<int> coord(3);
@@ -91,10 +91,11 @@ void Cell::ComputeHalfSpeed(double dt, sep::Axis axis) {
   if (type_ == FAKE || type_ == OBTAINED)
     return;
 
-	if (!neighbor_[axis].next->neighbor_[axis].next ||
-	    !neighbor_[axis].prev->neighbor_[axis].prev) {
-	  // this is border cell, should invoke another function
-	  // TODO: invoke another function
+	if (!neighbor_[axis].next->neighbor_[axis].next) {
+	  ComputeHalfSpeedNextIsBorder(dt, axis);
+	}
+	if (!neighbor_[axis].prev->neighbor_[axis].prev) {
+	  ComputeHalfSpeedPrevIsBorder(dt, axis);
 	  return;
 	}
 
@@ -106,7 +107,7 @@ void Cell::ComputeHalfSpeed(double dt, sep::Axis axis) {
 
 	for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
-	  coord = GetCoord((int)(cii-speed_half_.begin()));
+	  coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
@@ -148,7 +149,7 @@ void Cell::ComputeSpeed(double dt, sep::Axis axis) {
 
   for (cii=speed_.begin(); cii!=speed_.end(); ++cii) {
 
-    coord = GetCoord((int)(cii-speed_half_.begin()));
+    coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
@@ -173,7 +174,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
 
   for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
-    coord = GetCoord((int)(cii-speed_half_.begin()));
+    coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
@@ -210,7 +211,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
   // then find prev->speed_half() (f1/2) for speed > 0
   // it's diffuse reflection
 
-  // put (20.6) into (20.5) insted of f1/2 for speed < 0
+  // put (20.6) into (20.5) instead of f1/2 for speed < 0
   // in that way we find g for speed > 0
 
   // then put g for speed > 0 into (18.3) ->
@@ -220,7 +221,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
 
   for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
-    coord = GetCoord((int)(cii-speed_half_.begin()));
+    coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
     double g;
@@ -234,15 +235,13 @@ void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
       g = numenator2 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
 
       neighbor_[axis].prev->speed(coord) =
-        sep::max((double)0.0, 2.0f * g -
-          speed(coord));
+        sep::max((double)0.0, 2.0f * g - speed(coord));
 
       speed_half(coord) = speed(coord) +
         (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].next->Limiter(axis, coord);
     } else {
       // for speed < 0
 
-      // TODO: can we do it in the same loop??
       speed_half(coord) = neighbor_[axis].next->speed(coord) -
         (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].next->Limiter(axis, coord);
     }
@@ -266,7 +265,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(double dt, sep::Axis axis) {
 
   for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
-    coord = GetCoord((int)(cii-speed_half_.begin()));
+    coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
         
@@ -297,7 +296,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(double dt, sep::Axis axis) {
 
   for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
-    coord = GetCoord((int)(cii-speed_half_.begin()));
+    coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
     double g;
@@ -317,8 +316,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(double dt, sep::Axis axis) {
       g = numenator2 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_T_));
 
       neighbor_[axis].next->speed(coord) =
-        sep::max((double)0.0, 2.0f * g - 
-              speed(coord));
+        sep::max((double)0.0, 2.0f * g - speed(coord));
 
       neighbor_[axis].prev->speed_half(coord) = speed(coord) -
         (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
