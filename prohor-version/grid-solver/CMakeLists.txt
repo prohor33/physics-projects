@@ -7,10 +7,9 @@ cmake_minimum_required(VERSION 2.6)
   SET(SOURCES
           main.cpp
           cell.cpp
-          cell-container.cpp
-          step-maker.cpp
+          grid.cpp
           parameters.cpp
-          step-maker.cpp
+          solver.cpp
           )
 
   ADD_EXECUTABLE(grid-solver ${SOURCES})
