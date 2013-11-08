@@ -16,7 +16,13 @@ class Solver {
     return grids_;
   }
 
-  void MakeStep(sep::Axis axis, double dt) {};
+  void ComputeIteration(double dt);
+
+  void MakeStep(sep::Axis axis, double dt);
+
+  void ComputeHalfSpeed(double dt, sep::Axis axis);
+
+  void ComputeSpeed(double dt, sep::Axis axis);
 
  private:
 
