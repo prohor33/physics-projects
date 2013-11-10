@@ -27,6 +27,16 @@ class Parameters {
     time_step_ = time_step;
   }
 
+  void SetProcessID(int id) { process_id_ = id; }
+
+  int GetProcessID() {
+    return process_id_;
+  }
+
+  bool GetSecondGasIsActive() { return second_gas_is_active_; };
+
+  void SetSecondGasIsActive(bool x) { second_gas_is_active_ = x; };
+
  protected:
 
   Parameters() {};
@@ -37,6 +47,10 @@ class Parameters {
   double time_step_;
   vector<double> velocity_;
   sep::Limiter limiter_;
+
+  int process_id_; // for MPI
+
+  bool second_gas_is_active_; // second gas flag
 
 };
 

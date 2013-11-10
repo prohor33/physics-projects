@@ -3,30 +3,11 @@
 
 #include "cell.h"
 
-class Grid;
-
-struct GridNeighbor {
-
-  GridNeighbor(
-      Grid* next,
-      Grid* prev,
-      Grid* that
-      ) :
-      next(next),
-      prev(prev),
-      that(that)
-  {};
-
-public:
-  Grid *next;
-  Grid *prev;
-  Grid *that;
-};
 
 class Grid {
 
  public:
-  Grid() {};
+  Grid();
   ~Grid() {};
 
   void ComputeHalfSpeed(sep::Axis axis, double dt);
@@ -40,8 +21,7 @@ class Grid {
  private:
 
   vector<vector<vector<Cell*> > > cells_;
-
-  vector<GridNeighbor> neighbor_;  // for x, y, z axis
+  vector<vector<vector<Cell*> > > second_cells_;  // second gas cells
 
 };
 

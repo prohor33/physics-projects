@@ -4,6 +4,9 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
+#include <fstream>
+
+#include <mpi.h>
 
 using namespace std;
 

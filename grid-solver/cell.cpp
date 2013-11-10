@@ -1,6 +1,16 @@
 #include "cell.h"
 #include "parameters.h"
 
+Cell::Cell(GasNumb gas_numb, CellType type) :
+    gas_numb_(gas_numb),
+    type_(type)
+  {
+
+  // TODO: make it gauss function
+  speed_.push_back(1.0);
+
+};
+
 double Cell::MolMass() const {
   switch(gas_numb_) {
   case 1:
@@ -185,7 +195,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       denominator += fabs(p / MolMass()) *
-        exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
+        exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
     }
     else {
       // for speed < 0
@@ -231,9 +241,9 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       neighbor_[axis].prev->speed_half(coord) =
-         numenator1 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
+         numenator1 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
 
-      g = numenator2 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
+      g = numenator2 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
 
       neighbor_[axis].prev->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));
@@ -289,7 +299,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       denominator += fabs(p / MolMass()) *
-              exp((-1.0f) * p * p / (2.0f * MolMass() * wall_T_));
+              exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
     }
 
   }
@@ -312,9 +322,9 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       speed_half(coord) = 
-        numenator1 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_T_));
+        numenator1 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_t_));
 
-      g = numenator2 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_T_));
+      g = numenator2 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_t_));
 
       neighbor_[axis].next->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));

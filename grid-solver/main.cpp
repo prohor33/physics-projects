@@ -1,15 +1,14 @@
 #include "main.h"
 #include "solver.h"
 #include "parameters.h"
-#include "initializer.h"
+#include "manager.h"
 
 
 int main(int argc, char *argv[]) {
 
-  PARAMETERS->SetMolMass(1, 2);
-  PARAMETERS->SetTimeStep(0.1);
+  MANAGER->Initialize(argc, argv);
 
-  INITIALIZER->InitializeSolver();
+  SOLVER->RunComputation();
 
   return 0;
 }

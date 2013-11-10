@@ -9,22 +9,25 @@ struct CellNeighbor {
 
   CellNeighbor(
       Cell* next,
-      Cell* prev,
-      Cell* that
+      Cell* prev
       ) :
       next(next),
-      prev(prev),
-      that(that)
+      prev(prev)
   {};
 
 public:
   Cell *next;
   Cell *prev;
-  Cell *that;
 };
 
+class OutResult;
+
 class Cell {
+
+  friend class OutResult;
+
  public:
+
   enum GasNumb {
     FIRST = 0,
     SECOND = 1
@@ -36,10 +39,7 @@ class Cell {
     OBTAINED = 2
   };
 
-  Cell(GasNumb gas_numb, CellType type=NORMAL) :
-    gas_numb_(gas_numb),
-    type_(type)
-  {};
+  Cell(GasNumb gas_numb, CellType type=NORMAL);
 
   ~Cell() {};
 
@@ -77,7 +77,14 @@ class Cell {
 
   CellType type() { return type_; };
 
-  double& wall_T() { return wall_T_; };
+  double& wall_t() { return wall_t_; };
+
+  void SetNeighbors(CellNeighbor x, CellNeighbor y, CellNeighbor z) {
+    neighbor_.clear();
+    neighbor_.push_back(x);
+    neighbor_.push_back(y);
+    neighbor_.push_back(z);
+  }
 
  private:
 
@@ -88,7 +95,7 @@ class Cell {
   GasNumb gas_numb_;
   CellType type_;
 
-  double wall_T_;
+  double wall_t_;
 };
 
 #endif // _CELL_H_

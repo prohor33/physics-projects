@@ -4,11 +4,28 @@
 #include "main.h"
 #include "grid.h"
 
-class Initializer;
+class Manager;
+class OutResult;
+
+struct GridNeighbor {
+
+  GridNeighbor(
+      int next,
+      int prev
+      ) :
+      next(next),
+      prev(prev)
+  {};
+
+public:
+  int next;
+  int prev;
+};
 
 class Solver {
 
-  friend class Initializer;
+  friend class Manager;
+  friend class OutResult;
 
  public:
 
@@ -17,9 +34,11 @@ class Solver {
     return &Solver_;
   }
 
-  vector<vector<vector<Grid*> > >& grids() {
-    return grids_;
+  Grid* grid() {
+    return grid_;
   }
+
+  void RunComputation();
 
   void ComputeIteration(double dt);
 
@@ -33,6 +52,13 @@ class Solver {
 
   void ComputeSpeed(sep::Axis axis, double dt);
 
+  void SetGridNeighbors(GridNeighbor x, GridNeighbor y, GridNeighbor z) {
+    neighbors_.clear();
+    neighbors_.push_back(x);
+    neighbors_.push_back(y);
+    neighbors_.push_back(z);
+  }
+
  private:
 
   Solver() {};
@@ -40,7 +66,9 @@ class Solver {
 
  protected:
 
-  vector<vector<vector<Grid*> > > grids_;
+  Grid* grid_;
+
+  vector<GridNeighbor> neighbors_; // for x, y, z
 
 };
 
