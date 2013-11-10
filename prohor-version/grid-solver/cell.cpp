@@ -86,16 +86,17 @@ int Cell::GetIndex(vector<int> coord) {
 }
 
 
-void Cell::ComputeHalfSpeed(double dt, sep::Axis axis) {
+void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
   if (type_ == FAKE || type_ == OBTAINED)
     return;
 
 	if (!neighbor_[axis].next->neighbor_[axis].next) {
-	  ComputeHalfSpeedNextIsBorder(dt, axis);
+	  ComputeHalfSpeedNextIsBorder(axis, dt);
+	  return;
 	}
 	if (!neighbor_[axis].prev->neighbor_[axis].prev) {
-	  ComputeHalfSpeedPrevIsBorder(dt, axis);
+	  ComputeHalfSpeedPrevIsBorder(axis, dt);
 	  return;
 	}
 
@@ -129,7 +130,7 @@ void Cell::ComputeHalfSpeed(double dt, sep::Axis axis) {
 }
 
 
-void Cell::ComputeSpeed(double dt, sep::Axis axis) {
+void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
   if (type_ == FAKE || type_ == OBTAINED)
     return;
@@ -160,7 +161,7 @@ void Cell::ComputeSpeed(double dt, sep::Axis axis) {
 
 }
 
-void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
+void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
   double numenator1 = 0.0f;
   double numenator2 = 0.0f;
@@ -251,7 +252,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(double dt, sep::Axis axis) {
 }
 
 
-void Cell::ComputeHalfSpeedNextIsBorder(double dt, sep::Axis axis) {
+void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
 
   double numenator1 = 0.0f;
   double numenator2 = 0.0f;

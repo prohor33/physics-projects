@@ -1,9 +1,14 @@
 #ifndef _SOLVER_H_
 #define _SOLVER_H_
 
+#include "main.h"
 #include "grid.h"
 
+class Initializer;
+
 class Solver {
+
+  friend class Initializer;
 
  public:
 
@@ -12,7 +17,7 @@ class Solver {
     return &Solver_;
   }
 
-  vector<vector<vector<Grid> > >& grids() {
+  vector<vector<vector<Grid*> > >& grids() {
     return grids_;
   }
 
@@ -20,16 +25,23 @@ class Solver {
 
   void MakeStep(sep::Axis axis, double dt);
 
-  void ComputeHalfSpeed(double dt, sep::Axis axis);
+  void ExchangeEdgeZoneHalfSpeed();
 
-  void ComputeSpeed(double dt, sep::Axis axis);
+  void ExchangeEdgeZoneSpeed();
+
+  void ComputeHalfSpeed(sep::Axis axis, double dt);
+
+  void ComputeSpeed(sep::Axis axis, double dt);
 
  private:
 
   Solver() {};
   ~Solver() {};
 
-  vector<vector<vector<Grid> > > grids_;
+ protected:
+
+  vector<vector<vector<Grid*> > > grids_;
+
 };
 
 #define SOLVER Solver::Instance()

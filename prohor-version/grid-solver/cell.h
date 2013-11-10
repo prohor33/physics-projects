@@ -43,17 +43,16 @@ class Cell {
 
   ~Cell() {};
 
-  void ComputeHalfSpeed(double dt,
-      sep::Axis axis);
+  void ComputeHalfSpeed(sep::Axis axis,
+      double dt);
 
-  void ComputeSpeed(double dt,
-      sep::Axis axis);
+  void ComputeSpeed(sep::Axis axis, double dt);
 
-  void ComputeHalfSpeedPrevIsBorder(double dt,
-      sep::Axis axis);
+  void ComputeHalfSpeedPrevIsBorder(sep::Axis axis,
+      double dt);
 
-  void ComputeHalfSpeedNextIsBorder(double dt,
-    sep::Axis axis);
+  void ComputeHalfSpeedNextIsBorder(sep::Axis axis,
+      double dt);
 
   inline double& speed(vector<int> coord) {
     return speed_[GetIndex(coord)];

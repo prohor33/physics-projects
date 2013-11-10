@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 2.6)
           main.cpp
           cell.cpp
           grid.cpp
+          initializer.cpp
           parameters.cpp
           solver.cpp
           )
