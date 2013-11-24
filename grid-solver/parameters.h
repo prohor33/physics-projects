@@ -39,7 +39,7 @@ class Parameters {
 
  protected:
 
-  Parameters() {};
+  Parameters();
   ~Parameters() {};
 
   double mol_mass_gas1_, mol_mass_gas2_;
@@ -51,6 +51,9 @@ class Parameters {
   int process_id_; // for MPI
 
   bool second_gas_is_active_; // second gas flag
+
+  map<int, vector<int> > s_coord_map_1d_to_3d_;
+  map<vector<int>, int> s_coord_map_3d_to_1d_;
 
 };
 

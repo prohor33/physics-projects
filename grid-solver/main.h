@@ -5,6 +5,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 
 #include <mpi.h>
 

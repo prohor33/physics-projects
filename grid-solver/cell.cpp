@@ -7,7 +7,17 @@ Cell::Cell(GasNumb gas_numb, CellType type) :
   {
 
   // TODO: make it gauss function
-  speed_.push_back(1.0);
+  vector<int> coord;
+  for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
+
+    coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
+    speed_.push_back(1.0);
+  }
+
+  // initialize speed_half array
+  cout << "start" << endl;
+  speed_half_ = vector<double>(PARAMETERS->s_coord_map_1d_to_3d_.size());
+  cout << "end" << endl;
 
 };
 
@@ -80,31 +90,40 @@ double Cell::Limiter(sep::Axis axis,
 }
 
 vector<int> Cell::GetSpeedCoord(int index) {
-  // TODO: return real 3d coordinates
 
-  vector<int> coord(3);
-  coord[sep::X] = 13;
-  coord[sep::Y] = 21;
-  coord[sep::Z] = 32;
+  if (index > PARAMETERS->s_coord_map_1d_to_3d_.size()-1) {
 
-  return coord;
+    cout << "Error in GetSpeedCoord: too much index = " <<
+        index << " while map size = " <<
+        PARAMETERS->s_coord_map_1d_to_3d_.size() << endl;
+    return vector<int>(3);
+  }
+  return PARAMETERS->s_coord_map_1d_to_3d_[index];
 }
 
 int Cell::GetIndex(vector<int> coord) {
-  // TODO: to implement
-  return 13;
+
+  return PARAMETERS->s_coord_map_3d_to_1d_[coord];
 }
 
 
 void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
-  if (type_ == FAKE || type_ == OBTAINED)
+//  cout << "ComputeHalfSpeed" << endl;
+//  cout << "coord = (" << coord_x << ", " <<
+//      coord_y << ")" << endl;
+
+
+  if (type_ == FAKE || type_ == OBTAINED) {
+  //  cout << "ComputeHalfSpeed: Fake or Obtained" << endl;
     return;
+  }
 
 	if (!neighbor_[axis].next->neighbor_[axis].next) {
 	  ComputeHalfSpeedNextIsBorder(axis, dt);
 	  return;
 	}
+
 	if (!neighbor_[axis].prev->neighbor_[axis].prev) {
 	  ComputeHalfSpeedPrevIsBorder(axis, dt);
 	  return;
@@ -142,13 +161,13 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
 void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
-  if (type_ == FAKE || type_ == OBTAINED)
-    return;
+  cout << "ComputeSpeed" << endl;
 
-  if (!neighbor_[axis].next->neighbor_[axis].next ||
-      !neighbor_[axis].prev->neighbor_[axis].prev) {
-    // this is border cell, should invoke another function
-    // TODO: invoke another function
+  cout << "coord = (" << coord_x << ", " <<
+      coord_y << ")" << endl;
+
+  if (type_ == FAKE || type_ == OBTAINED) {
+    cout << "fake or obtained" << endl;
     return;
   }
 
@@ -160,18 +179,43 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
   for (cii=speed_.begin(); cii!=speed_.end(); ++cii) {
 
-    coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
+    coord = GetSpeedCoord((int)(cii-speed_.begin()));
+
     p = P(axis, coord);
+
+    cout << "1" << endl;
+
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
+
+    cout << "2" << endl;
+
+    cout << "neigh = " << neighbor_[axis].prev << endl;
+
+    // wtf? absolutely wrong coordinates
+    // should be like (0,0,0)
+    cout << "speed coord = (" << coord[0] << ", " <<
+        coord[1] << ", " <<
+        coord[2] << ")" << endl;
+
+    cout << "2.01" << endl;
+
+    cout << "neigh->speed_half = " << neighbor_[axis].prev->speed_half(coord);
+
+    cout << "2.1" << endl;
 
     (*cii) = (*cii) -
         gamma * (speed_half(coord) - neighbor_[axis].prev->speed_half(coord));
 
+    cout << "3" << endl;
+
   }
+
+  cout << "ComputeSpeedEnd" << endl;
 
 }
 
 void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
+  //cout << "ComputeHalfSpeedPrevIsBorder" << endl;
 
   double numenator1 = 0.0f;
   double numenator2 = 0.0f;
@@ -263,6 +307,8 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
 
 void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
+
+  //cout << "ComputeHalfSpeedPrevIsBorder" << endl;
 
   double numenator1 = 0.0f;
   double numenator2 = 0.0f;

@@ -3,8 +3,9 @@
 
 void Solver::RunComputation() {
 
-  for (int i=0; i<100; i++) {
+  for (int i=0; i<2; i++) {
     ComputeIteration(0.01);
+    cout << "iteration " << i << " done" << endl;
   }
 
 }
@@ -44,9 +45,11 @@ void Solver::MakeStep(sep::Axis axis, double dt) {
 
 void Solver::ExchangeEdgeZoneHalfSpeed() {
   // TODO: to implement
+  cout << "ExchangeEdgeZoneHalfSpeed" << endl;
 }
 
 
 void Solver::ExchangeEdgeZoneSpeed() {
   // TODO: to implement
+  cout << "ExchangeEdgeZoneSpeed" << endl;
 }

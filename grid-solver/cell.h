@@ -86,6 +86,9 @@ class Cell {
     neighbor_.push_back(z);
   }
 
+  // for debug
+  int coord_x, coord_y, coord_z;
+
  private:
 
   vector<double> speed_;
