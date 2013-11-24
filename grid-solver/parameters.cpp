@@ -5,7 +5,7 @@ Parameters::Parameters() {
   double speed_cut = 4.8f;
 
   // fill in velocities
-  int speed_quantity = 20;
+  int speed_quantity = 8; // for debug (should be 20)
   for (int i=0; i<speed_quantity; i++) {
     velocity_.push_back(-speed_cut + i * speed_cut * 2.0f / (speed_quantity-1));
   }

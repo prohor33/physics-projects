@@ -6,12 +6,33 @@ Cell::Cell(GasNumb gas_numb, CellType type) :
     type_(type)
   {
 
-  // TODO: make it gauss function
+  // TODO: make it Gauss function
   vector<int> coord;
+  double n = 1.0;
+  double T_start = 1.0;
+  double C = 0;
+
+  // process C
   for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
 
     coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
-    speed_.push_back(1.0);
+
+    C += exp((-1.0f)*
+        (sep::sqr(P(sep::X, coord)) +
+        sep::sqr(P(sep::Y, coord)) +
+        sep::sqr(P(sep::Z, coord)) /
+      (2.0f*MolMass()*T_start)));
+  }
+
+  for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
+
+    coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
+
+    speed_.push_back(n * C * exp((-1.0f)*
+        (sep::sqr(P(sep::X, coord)) +
+        sep::sqr(P(sep::Y, coord)) +
+        sep::sqr(P(sep::Z, coord))) /
+        (2.0f*MolMass()*T_start)));
   }
 
   // initialize speed_half array
@@ -41,8 +62,8 @@ double Cell::H() const {
 
 double Cell::P(sep::Axis axis,
     vector<int> coord) const {
-  // TODO: why is speed here?
-  return PARAMETERS->velocity_[coord[axis]];
+
+  return PARAMETERS->velocity_[coord[axis]] * MolMass();
 }
 
 double Cell::Limiter(sep::Axis axis,
@@ -109,13 +130,7 @@ int Cell::GetIndex(vector<int> coord) {
 
 void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
-//  cout << "ComputeHalfSpeed" << endl;
-//  cout << "coord = (" << coord_x << ", " <<
-//      coord_y << ")" << endl;
-
-
   if (type_ == FAKE || type_ == OBTAINED) {
-  //  cout << "ComputeHalfSpeed: Fake or Obtained" << endl;
     return;
   }
 
@@ -161,13 +176,7 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
 void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
-  cout << "ComputeSpeed" << endl;
-
-  cout << "coord = (" << coord_x << ", " <<
-      coord_y << ")" << endl;
-
   if (type_ == FAKE || type_ == OBTAINED) {
-    cout << "fake or obtained" << endl;
     return;
   }
 
@@ -183,39 +192,15 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
     p = P(axis, coord);
 
-    cout << "1" << endl;
-
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
-
-    cout << "2" << endl;
-
-    cout << "neigh = " << neighbor_[axis].prev << endl;
-
-    // wtf? absolutely wrong coordinates
-    // should be like (0,0,0)
-    cout << "speed coord = (" << coord[0] << ", " <<
-        coord[1] << ", " <<
-        coord[2] << ")" << endl;
-
-    cout << "2.01" << endl;
-
-    cout << "neigh->speed_half = " << neighbor_[axis].prev->speed_half(coord);
-
-    cout << "2.1" << endl;
 
     (*cii) = (*cii) -
         gamma * (speed_half(coord) - neighbor_[axis].prev->speed_half(coord));
 
-    cout << "3" << endl;
-
   }
-
-  cout << "ComputeSpeedEnd" << endl;
-
 }
 
 void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
-  //cout << "ComputeHalfSpeedPrevIsBorder" << endl;
 
   double numenator1 = 0.0f;
   double numenator2 = 0.0f;
@@ -300,15 +285,11 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       speed_half(coord) = neighbor_[axis].next->speed(coord) -
         (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].next->Limiter(axis, coord);
     }
-
   }
-
 }
 
 
 void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
-
-  //cout << "ComputeHalfSpeedPrevIsBorder" << endl;
 
   double numenator1 = 0.0f;
   double numenator2 = 0.0f;

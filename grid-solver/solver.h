@@ -38,7 +38,7 @@ class Solver {
     return grid_;
   }
 
-  void RunComputation();
+  void Compute();
 
   void ComputeIteration(double dt);
 

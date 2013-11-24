@@ -6,13 +6,27 @@
 
 void OutResult::OutParameters() {
 
-  // TODO: here we should evoke functions for temperature, concentration, etc
-  // but for test we can just print single speed in the each cell
+  // out T
+  ofstream out_T_file;
+  out_T_file.open ("test_T.result");
 
-  ofstream out_file;
-  out_file.open ("test_result");
+  switch (output_type_) {
+  case OUT_FOR_PYTHON:
+    vector<CellParameters>::iterator cii;
+    for (cii=parameters_.begin(); cii!=parameters_.end(); ++cii) {
+      out_T_file << (*cii).coord[sep::X] << " " <<
+          (*cii).coord[sep::Y] << " " <<
+          (*cii).coord[sep::Z] << " " <<
+          (*cii).T << endl;
+    }
+    break;
+  }
 
-  int z = 0;
+  out_T_file.close();
+}
+
+// prepare parameters to be printed out
+void OutResult::ProcessParameters() {
 
   vector<vector<vector<Cell*> > >::iterator cii_x;
   vector<vector<Cell*> >::iterator cii_xy;
@@ -26,24 +40,59 @@ void OutResult::OutParameters() {
     for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
       for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
 
-        if ((*cii_xyz)->type() == Cell::NORMAL) {
+        if ((*cii_xyz)->type() != Cell::NORMAL)
+          continue;
 
-          for (cii=(*cii_xyz)->speed_.begin();
-            cii!=(*cii_xyz)->speed_.end(); ++cii) {
+        // process T
+        double n = 0.0;
+        double u_x = 0.0;
+        double u_y = 0.0;
+        double u_z = 0.0;
+        double T = 0.0;
 
-            coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+        // process constants
+        for (cii=(*cii_xyz)->speed_.begin();
+          cii!=(*cii_xyz)->speed_.end(); ++cii) {
 
-            out_file <<
-                coord[sep::X] << " " <<
-                coord[sep::Y] << " " <<
-                coord[sep::Z] << " " <<
-                (*cii_xyz)->speed(coord) << endl;
-          }
+          coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+
+          cout << "n = " << n << " + " << (*cii) << endl;
+
+          n += (*cii_xyz)->speed(coord);
+
+          u_x += (*cii_xyz)->speed(coord) *
+              (*cii_xyz)->P(sep::X, coord) / (*cii_xyz)->MolMass();
+
+          u_y += (*cii_xyz)->speed(coord) *
+              (*cii_xyz)->P(sep::Y, coord) / (*cii_xyz)->MolMass();
+
+          u_z += (*cii_xyz)->speed(coord) *
+              (*cii_xyz)->P(sep::Z, coord) / (*cii_xyz)->MolMass();
         }
+
+        // normalize
+        u_x /= n; u_y /= n; u_z /= n;
+
+        for (cii=(*cii_xyz)->speed_.begin();
+          cii!=(*cii_xyz)->speed_.end(); ++cii) {
+
+          coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+
+          T += (*cii_xyz)->MolMass() *
+              (sep::sqr((*cii_xyz)->P(sep::X, coord) / (*cii_xyz)->MolMass() - u_x)+
+              sep::sqr((*cii_xyz)->P(sep::Y, coord) / (*cii_xyz)->MolMass() - u_y)+
+              sep::sqr((*cii_xyz)->P(sep::Z, coord) / (*cii_xyz)->MolMass() - u_z)) *
+              (*cii_xyz)->speed(coord);
+        }
+
+        T /= n;
+        // capacity
+        T /= 3;
+
+        cout << "fill in parameters: T = " <<
+            T << "; n = " << n << endl;
+        parameters_.push_back(CellParameters(coord, T, n));
       }
     }
   }
-
-  out_file.close();
-
 }

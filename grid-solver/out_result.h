@@ -4,6 +4,29 @@
 #include "main.h"
 
 
+class CellParameters {
+
+public:
+
+  CellParameters() {};
+
+  CellParameters(
+      vector<int> coord,
+      double T,
+      double n
+      ) :
+      coord(coord),
+      T(T),
+      n(n)
+      {};
+
+  ~CellParameters() {};
+
+  vector<int> coord;
+  double T;
+  double n;
+};
+
 class OutResult {
 
  public:
@@ -19,6 +42,8 @@ class OutResult {
 
   void OutParameters();
 
+  void ProcessParameters();
+
   void SetOutputType(OutType output_type) {
     output_type_ = output_type;
   }
@@ -30,7 +55,7 @@ class OutResult {
 
  protected:
   OutType output_type_;
-
+  vector<CellParameters> parameters_;
 };
 
 #define OUT_RESULT OutResult::Instance()

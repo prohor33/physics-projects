@@ -1,3 +1,8 @@
 # binary
 
 grid-solver
+
+
+# result files
+
+*.result

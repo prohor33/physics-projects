@@ -7,8 +7,8 @@ Grid::Grid() {
   // for test let's create rectangle grid n x m
   // with only one gas
   int n, m;
-  n = 20;
-  m = 30;
+  n = 5;
+  m = 4;
   Cell* cell;
 
   // initialize cells for first gas

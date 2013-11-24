@@ -1,7 +1,7 @@
 #include "solver.h"
 
 
-void Solver::RunComputation() {
+void Solver::Compute() {
 
   for (int i=0; i<2; i++) {
     ComputeIteration(0.01);
