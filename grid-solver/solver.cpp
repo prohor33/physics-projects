@@ -31,7 +31,7 @@ void Solver::ComputeIteration(double dt) {
 
   MakeStep(sep::Y, dt);
 
-  //MakeStep(sep::X, dt/2);
+  MakeStep(sep::X, dt/2);
 
 }
 
