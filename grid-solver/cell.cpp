@@ -1,7 +1,9 @@
 #include "cell.h"
 #include "parameters.h"
 
-Cell::Cell(GasNumb gas_numb, CellType type) :
+#include <stdlib.h>
+
+Cell::Cell(sep::GasNumb gas_numb, CellType type) :
     gas_numb_(gas_numb),
     type_(type)
   {
@@ -24,6 +26,9 @@ Cell::Cell(GasNumb gas_numb, CellType type) :
       (2.0f*MolMass()*T_start)));
   }
 
+  /* n0 = 1.0 */
+  C = 1.0f / C;
+
   for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
 
     coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
@@ -33,22 +38,21 @@ Cell::Cell(GasNumb gas_numb, CellType type) :
         sep::sqr(P(sep::Y, coord)) +
         sep::sqr(P(sep::Z, coord))) /
         (2.0f*MolMass()*T_start)));
+
+    //cout << "speed = " << speed_[i] << endl;
   }
 
   // initialize speed_half array
-  cout << "start" << endl;
   speed_half_ = vector<double>(PARAMETERS->s_coord_map_1d_to_3d_.size());
-  cout << "end" << endl;
-
 };
 
 double Cell::MolMass() const {
   switch(gas_numb_) {
-  case 1:
+  case 0:
     return PARAMETERS->mol_mass_gas1_;
     break;
-  case 2:
-    return PARAMETERS->mol_mass_gas1_;
+  case 1:
+    return PARAMETERS->mol_mass_gas2_;
     break;
   }
   return 0;
@@ -144,6 +148,10 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 	  return;
 	}
 
+//  cout << "space_coord: " << space_coord()[0] << " " <<
+//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
+//  cout << "speed_[0] = " << speed_[0] << endl;
+
 	double gamma;
 	double p;
 
@@ -156,21 +164,35 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
+    //cout << "gamma = " << gamma << endl;
+
     if (p > 0.0f) {
       // for speed > 0
 
       (*cii) = speed(coord) +
-        ( 1.0f - fabs( gamma ) ) / 2.0f * Limiter(axis, coord);
+        (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
+//      cout << "speed_half = " << (*cii) << endl;
+//      cout << "speed(coord) = " << speed(coord) << endl;
+//      cout << "GetIndex(coord)" << GetIndex(coord) << endl;
+//      cout << "speed_.size() = " << speed_.size() << endl;
+//      cout << "speed_[0] = " << speed_[0] << endl;
     }
     else {
       // for speed < 0
 
       (*cii) = neighbor_[axis].next->speed(coord) -
-        ( 1.0f - fabs( gamma ) ) / 2.0f *
+        (1.0f - fabs(gamma)) / 2.0f *
         neighbor_[axis].next->Limiter(axis, coord);
+      //cout << "speed_half = " << (*cii) << endl;
 
 	  }
 	}
+
+//	cout << "after:" << endl;
+//  cout << "space_coord: " << space_coord()[0] << " " <<
+//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
+//  cout << "speed_[0] = " << speed_[0] << endl;
+//  cout << endl;
 }
 
 
@@ -179,6 +201,12 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
   if (type_ == FAKE || type_ == OBTAINED) {
     return;
   }
+
+//  cout << "space_coord: " << space_coord()[0] << " " <<
+//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
+//  cout << "speed_[0] = " << speed_[0] << endl;
+
+  // it's corrupt (2,1) cell!!!
 
   double gamma;
   double p;
@@ -194,10 +222,30 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
+//    if (isnan(*cii)) {
+//      cout << "already nan???" << endl;
+//      exit(0);
+//    }
+
     (*cii) = (*cii) -
         gamma * (speed_half(coord) - neighbor_[axis].prev->speed_half(coord));
 
+//    if (isnan(*cii)) {
+//      cout << "nan" << endl;
+//      cout << "gamma = " << gamma << endl;
+//      cout << "speed_half(coord) = " << speed_half(coord) << endl;
+//      cout << "neighbor_[axis].prev->speed_half(coord) = " <<
+//          neighbor_[axis].prev->speed_half(coord) << endl;
+//      exit(0);
+//    }
+
   }
+
+//  cout << "after:" << endl;
+//  cout << "space_coord: " << space_coord()[0] << " " <<
+//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
+//  cout << "speed_[0] = " << speed_[0] << endl;
+//  cout << endl;
 }
 
 void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
@@ -225,6 +273,12 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
       denominator += fabs(p / MolMass()) *
         exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
+
+//      cout << "denominator = " << denominator << endl;
+//      cout << "p = " << p << endl;
+//      cout << "MolMass() = " << MolMass() << endl;
+//      cout << "wall_t_ = " << wall_t_ << endl;
+//      exit(0);
     }
     else {
       // for speed < 0
@@ -234,6 +288,11 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
       neighbor_[axis].prev->speed_half(coord) = speed(coord) -
         (1.0 - fabs(gamma)) / 2.0f * Limiter(axis, coord);
+
+//      if (isnan(neighbor_[axis].prev->speed_half(coord))) {
+//        cout << "nan2" << endl;
+//        exit(0);
+//      }
 
       numenator1 += fabs(p / MolMass()) *
           neighbor_[axis].prev->speed_half(coord);
@@ -269,10 +328,23 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
     if (p > 0.0f) {
       // for speed > 0
 
-      neighbor_[axis].prev->speed_half(coord) =
-         numenator1 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
+      if (isnan(neighbor_[axis].prev->speed_half(coord))) {
+        cout << "WAT?" << endl;
+      }
 
-      g = numenator2 / denominator * exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
+      neighbor_[axis].prev->speed_half(coord) =
+         numenator1 / denominator * exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
+
+      if (isnan(neighbor_[axis].prev->speed_half(coord))) {
+        cout << "nan3" << endl;
+        cout << "wall_t_ = " << wall_t_ << endl;
+        cout << "denominator = " << denominator << endl;
+        cout << "MolMass() = " << MolMass() << endl;
+        cout << "sep::sqr(p) = " << sep::sqr(p) << endl;
+        exit(0);
+      }
+
+      g = numenator2 / denominator * exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
 
       neighbor_[axis].prev->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));

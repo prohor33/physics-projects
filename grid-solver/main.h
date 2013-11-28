@@ -5,7 +5,9 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <map>
+#include <math.h> // for nan
 
 #include <mpi.h>
 
@@ -25,6 +27,11 @@ namespace sep { // my separator namespace
     STRANGE = 2
   };
 
+  enum GasNumb {
+    FIRST = 0,
+    SECOND = 1
+  };
+
   template <typename T> inline T sqr(T x) { return x*x; }
   template <typename T> inline T min(T x) { return x*x; }
   template <typename T> inline T sign(T x) { return x == 0 ? 0 : (x > 0 ? 1 : -1); };
@@ -32,6 +39,7 @@ namespace sep { // my separator namespace
   template <typename T> inline T min( T x, T y ) { return x > y ? y : x; };
   template <typename T> inline T max( T x, T y ) { return x > y ? x : y; };
 
+  string int_to_string(int i);
 }
 
 #endif // _MAIN_H_

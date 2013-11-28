@@ -11,18 +11,20 @@ class Grid {
   ~Grid() {};
 
   void ComputeHalfSpeed(sep::Axis axis, double dt);
+  void ComputeHalfSpeed(sep::GasNumb gas_numb, sep::Axis axis, double dt);
 
   void ComputeSpeed(sep::Axis axis, double dt);
+  void ComputeSpeed(sep::GasNumb gas_numb, sep::Axis axis, double dt);
 
-  vector<vector<vector<Cell*> > >& cells() {
-    return cells_;
+  vector<vector<vector<Cell*> > >& cells(sep::GasNumb gas_number) {
+    return cells_[gas_number];
   }
 
  private:
 
-  vector<vector<vector<Cell*> > > cells_;
-  vector<vector<vector<Cell*> > > second_cells_;  // second gas cells
+  void InitGasCells(sep::GasNumb gas_number);
 
+  vector<vector<vector<Cell*> > > cells_[2];   // two gases
 };
 
 #endif  // _GRID_H_

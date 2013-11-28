@@ -28,18 +28,13 @@ class Cell {
 
  public:
 
-  enum GasNumb {
-    FIRST = 0,
-    SECOND = 1
-  };
-
   enum CellType {
     NORMAL = 0,
     FAKE = 1,
     OBTAINED = 2
   };
 
-  Cell(GasNumb gas_numb, CellType type=NORMAL);
+  Cell(sep::GasNumb gas_numb, CellType type=NORMAL);
 
   ~Cell() {};
 
@@ -86,8 +81,14 @@ class Cell {
     neighbor_.push_back(z);
   }
 
-  // for debug
-  int coord_x, coord_y, coord_z;
+  void SetSpaceCoord(int x, int y, int z) {
+    space_coord_ = vector<int>(3);
+    space_coord_[sep::X] = x;
+    space_coord_[sep::Y] = y;
+    space_coord_[sep::Z] = z;
+  }
+
+  vector<int> space_coord() { return space_coord_; };
 
  private:
 
@@ -95,8 +96,10 @@ class Cell {
   vector<double> speed_half_;
 
   vector<CellNeighbor> neighbor_;  // for x, y, z axis
-  GasNumb gas_numb_;
+  sep::GasNumb gas_numb_;
   CellType type_;
+
+  vector<int> space_coord_;
 
   double wall_t_;
 };

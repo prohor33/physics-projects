@@ -40,9 +40,9 @@ class OutResult {
     return &OutResult_;
   }
 
-  void OutParameters();
+  void OutParameters(sep::GasNumb gas_numb);
 
-  void ProcessParameters();
+  void ProcessParameters(sep::GasNumb gas_numb);
 
   void SetOutputType(OutType output_type) {
     output_type_ = output_type;
@@ -54,8 +54,10 @@ class OutResult {
   ~OutResult() {};
 
  protected:
+
   OutType output_type_;
-  vector<CellParameters> parameters_;
+
+  vector<CellParameters> parameters_[2];  // two gases
 };
 
 #define OUT_RESULT OutResult::Instance()

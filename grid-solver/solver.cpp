@@ -1,5 +1,15 @@
 #include "solver.h"
 
+string sep::int_to_string(int i) {
+
+    stringstream ss;
+    std::string s;
+    ss << i;
+    s = ss.str();
+
+    return s;
+};
+
 
 void Solver::Compute() {
 
@@ -21,7 +31,7 @@ void Solver::ComputeIteration(double dt) {
 
   MakeStep(sep::Y, dt);
 
-  MakeStep(sep::X, dt/2);
+  //MakeStep(sep::X, dt/2);
 
 }
 

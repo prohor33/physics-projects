@@ -4,16 +4,21 @@
 #include "cell.h"
 
 
-void OutResult::OutParameters() {
+void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
   // out T
   ofstream out_T_file;
-  out_T_file.open ("test_T.result");
+  out_T_file.open(string("test_T_gas" + sep::int_to_string(gas_numb) + ".result").c_str());
 
   switch (output_type_) {
+
   case OUT_FOR_PYTHON:
+
     vector<CellParameters>::iterator cii;
-    for (cii=parameters_.begin(); cii!=parameters_.end(); ++cii) {
+
+    for (cii=parameters_[gas_numb].begin();
+        cii!=parameters_[gas_numb].end(); ++cii) {
+
       out_T_file << (*cii).coord[sep::X] << " " <<
           (*cii).coord[sep::Y] << " " <<
           (*cii).coord[sep::Z] << " " <<
@@ -26,7 +31,7 @@ void OutResult::OutParameters() {
 }
 
 // prepare parameters to be printed out
-void OutResult::ProcessParameters() {
+void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
   vector<vector<vector<Cell*> > >::iterator cii_x;
   vector<vector<Cell*> >::iterator cii_xy;
@@ -36,7 +41,8 @@ void OutResult::ProcessParameters() {
 
   vector<int> coord(3);
 
-  for (cii_x=SOLVER->grid_->cells().begin(); cii_x!=SOLVER->grid_->cells().end(); ++cii_x) {
+  for (cii_x=SOLVER->grid_->cells(gas_numb).begin();
+      cii_x!=SOLVER->grid_->cells(gas_numb).end(); ++cii_x) {
     for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
       for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
 
@@ -56,7 +62,7 @@ void OutResult::ProcessParameters() {
 
           coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
 
-          cout << "n = " << n << " + " << (*cii) << endl;
+          //cout << "n = " << n << " + " << (*cii) << endl;
 
           n += (*cii_xyz)->speed(coord);
 
@@ -91,7 +97,7 @@ void OutResult::ProcessParameters() {
 
         cout << "fill in parameters: T = " <<
             T << "; n = " << n << endl;
-        parameters_.push_back(CellParameters(coord, T, n));
+        parameters_[gas_numb].push_back(CellParameters((*cii_xyz)->space_coord(), T, n));
       }
     }
   }
