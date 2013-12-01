@@ -27,6 +27,10 @@ class Parameters {
     time_step_ = time_step;
   }
 
+  void SetLimiter(sep::Limiter limiter) {
+    limiter_ = limiter;
+  }
+
   void SetProcessID(int id) { process_id_ = id; }
 
   int GetProcessID() {

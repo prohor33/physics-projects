@@ -19,8 +19,8 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
   // for test let's create rectangle grid n x m
   // with only one gas
   int n, m;
-  n = 50;
-  m = 50;
+  n = 10;
+  m = 8;
   Cell* cell;
 
   // initialize cells for our gas

@@ -148,10 +148,6 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 	  return;
 	}
 
-//  cout << "space_coord: " << space_coord()[0] << " " <<
-//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
-//  cout << "speed_[0] = " << speed_[0] << endl;
-
 	double gamma;
 	double p;
 
@@ -164,18 +160,11 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
-    //cout << "gamma = " << gamma << endl;
-
     if (p > 0.0f) {
       // for speed > 0
 
       (*cii) = speed(coord) +
         (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
-//      cout << "speed_half = " << (*cii) << endl;
-//      cout << "speed(coord) = " << speed(coord) << endl;
-//      cout << "GetIndex(coord)" << GetIndex(coord) << endl;
-//      cout << "speed_.size() = " << speed_.size() << endl;
-//      cout << "speed_[0] = " << speed_[0] << endl;
     }
     else {
       // for speed < 0
@@ -183,16 +172,8 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
       (*cii) = neighbor_[axis].next->speed(coord) -
         (1.0f - fabs(gamma)) / 2.0f *
         neighbor_[axis].next->Limiter(axis, coord);
-      //cout << "speed_half = " << (*cii) << endl;
-
 	  }
 	}
-
-//	cout << "after:" << endl;
-//  cout << "space_coord: " << space_coord()[0] << " " <<
-//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
-//  cout << "speed_[0] = " << speed_[0] << endl;
-//  cout << endl;
 }
 
 
@@ -201,12 +182,6 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
   if (type_ == FAKE || type_ == OBTAINED) {
     return;
   }
-
-//  cout << "space_coord: " << space_coord()[0] << " " <<
-//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
-//  cout << "speed_[0] = " << speed_[0] << endl;
-
-  // it's corrupt (2,1) cell!!!
 
   double gamma;
   double p;
@@ -222,30 +197,9 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
-//    if (isnan(*cii)) {
-//      cout << "already nan???" << endl;
-//      exit(0);
-//    }
-
-    (*cii) = (*cii) -
+    speed(coord) += -
         gamma * (speed_half(coord) - neighbor_[axis].prev->speed_half(coord));
-
-//    if (isnan(*cii)) {
-//      cout << "nan" << endl;
-//      cout << "gamma = " << gamma << endl;
-//      cout << "speed_half(coord) = " << speed_half(coord) << endl;
-//      cout << "neighbor_[axis].prev->speed_half(coord) = " <<
-//          neighbor_[axis].prev->speed_half(coord) << endl;
-//      exit(0);
-//    }
-
   }
-
-//  cout << "after:" << endl;
-//  cout << "space_coord: " << space_coord()[0] << " " <<
-//      space_coord()[1] << " " << space_coord()[2] << " " << endl;
-//  cout << "speed_[0] = " << speed_[0] << endl;
-//  cout << endl;
 }
 
 void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
@@ -272,13 +226,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       denominator += fabs(p / MolMass()) *
-        exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
-
-//      cout << "denominator = " << denominator << endl;
-//      cout << "p = " << p << endl;
-//      cout << "MolMass() = " << MolMass() << endl;
-//      cout << "wall_t_ = " << wall_t_ << endl;
-//      exit(0);
+        exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
     }
     else {
       // for speed < 0
@@ -288,11 +236,6 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
       neighbor_[axis].prev->speed_half(coord) = speed(coord) -
         (1.0 - fabs(gamma)) / 2.0f * Limiter(axis, coord);
-
-//      if (isnan(neighbor_[axis].prev->speed_half(coord))) {
-//        cout << "nan2" << endl;
-//        exit(0);
-//      }
 
       numenator1 += fabs(p / MolMass()) *
           neighbor_[axis].prev->speed_half(coord);
@@ -328,21 +271,8 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
     if (p > 0.0f) {
       // for speed > 0
 
-      if (isnan(neighbor_[axis].prev->speed_half(coord))) {
-        cout << "WAT?" << endl;
-      }
-
       neighbor_[axis].prev->speed_half(coord) =
          numenator1 / denominator * exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
-
-      if (isnan(neighbor_[axis].prev->speed_half(coord))) {
-        cout << "nan3" << endl;
-        cout << "wall_t_ = " << wall_t_ << endl;
-        cout << "denominator = " << denominator << endl;
-        cout << "MolMass() = " << MolMass() << endl;
-        cout << "sep::sqr(p) = " << sep::sqr(p) << endl;
-        exit(0);
-      }
 
       g = numenator2 / denominator * exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
 
