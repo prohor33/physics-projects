@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
   PARAMETERS->SetLimiter(sep::MC);
   PARAMETERS->SetMolMass(1.0, 2.0);
   PARAMETERS->SetTimeStep(0.02/4.8);  // for debug
+  PARAMETERS->SetSecondGasIsActive(false);
 
   MANAGER->Initialize(argc, argv);
 

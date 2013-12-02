@@ -1,5 +1,6 @@
 #include "grid.h"
 #include "cell.h"
+#include "parameters.h"
 
 
 Grid::Grid() {
@@ -46,7 +47,7 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
           if (i == 1 || i == n-2)
             cell->wall_t() = 1.0;
           if (j == 1 || j == m-2)
-            cell->wall_t() = 0.6;
+            cell->wall_t() = 0.8;
         }
       }
 
@@ -95,10 +96,9 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
 void Grid::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
   ComputeHalfSpeed(sep::FIRST, axis, dt);
-  cout << "ComputeHalfSpeed for first gas done" << endl;
 
-  ComputeHalfSpeed(sep::SECOND, axis, dt);
-  cout << "ComputeHalfSpeed for second gas done" << endl;
+  if (PARAMETERS->GetSecondGasIsActive())
+    ComputeHalfSpeed(sep::SECOND, axis, dt);
 }
 
 
@@ -108,7 +108,6 @@ void Grid::ComputeHalfSpeed(sep::GasNumb gas_numb, sep::Axis axis, double dt) {
   vector<vector<Cell*> >::iterator cii_xy;
   vector<Cell*>::iterator cii_xyz;
 
-  // first gas
   for (cii_x=cells_[gas_numb].begin(); cii_x!=cells_[gas_numb].end(); ++cii_x) {
     for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
       for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
@@ -120,8 +119,11 @@ void Grid::ComputeHalfSpeed(sep::GasNumb gas_numb, sep::Axis axis, double dt) {
 
 
 void Grid::ComputeSpeed(sep::Axis axis, double dt) {
+
   ComputeSpeed(sep::FIRST, axis, dt);
-  ComputeSpeed(sep::SECOND, axis, dt);
+
+  if (PARAMETERS->GetSecondGasIsActive())
+    ComputeSpeed(sep::SECOND, axis, dt);
 }
 
 

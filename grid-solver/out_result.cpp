@@ -95,8 +95,8 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         // capacity
         T /= 3;
 
-        cout << "fill in parameters: T = " <<
-            T << "; n = " << n << endl;
+//        cout << "fill in parameters: T = " <<
+//            T << "; n = " << n << endl;
         parameters_[gas_numb].push_back(CellParameters((*cii_xyz)->space_coord(), T, n));
       }
     }

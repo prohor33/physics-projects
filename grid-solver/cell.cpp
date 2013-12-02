@@ -78,6 +78,8 @@ double Cell::Limiter(sep::Axis axis,
     return -1.0f;
   }
 
+  double a;
+
   double val = speed(coord);
   double next = neighbor_[axis].next->speed(coord);
   double prev = neighbor_[axis].prev->speed(coord);
@@ -91,11 +93,16 @@ double Cell::Limiter(sep::Axis axis,
     break;
 
   case sep::MC:
-    return sep::min(
+//    cout << "val = " << val << endl;
+//    cout << "next = " << next << endl;
+//    cout << "prev = " << prev << endl;
+    a = sep::min(
         sep::min(sep::module(next - prev) / 2.0f,
         2.0f * sep::module(next - val)),
         2.0f * sep::module(val - prev)) *
         sep::sign(next - val);
+    //cout << "limiter = " << a << endl;
+    return a;
     break;
 
   case sep::STRANGE:
@@ -197,8 +204,8 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
-    speed(coord) += -
-        gamma * (speed_half(coord) - neighbor_[axis].prev->speed_half(coord));
+    speed(coord) +=
+        - gamma * (speed_half(coord) - neighbor_[axis].prev->speed_half(coord));
   }
 }
 
@@ -243,7 +250,6 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       numenator2 += fabs(p / MolMass()) *
           0.5f * (neighbor_[axis].prev->speed(coord) + speed(coord));
     }
-
   }
 
 
@@ -280,7 +286,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
         sep::max((double)0.0, 2.0f * g - speed(coord));
 
       speed_half(coord) = speed(coord) +
-        (1.0f - fabs(gamma)) / 2.0f * neighbor_[axis].next->Limiter(axis, coord);
+        (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
     } else {
       // for speed < 0
 
@@ -328,7 +334,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       denominator += fabs(p / MolMass()) *
-              exp((-1.0f) * p * p / (2.0f * MolMass() * wall_t_));
+              exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
     }
 
   }
@@ -351,9 +357,9 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       speed_half(coord) = 
-        numenator1 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_t_));
+        numenator1 / denominator * exp((-1.0f * sep::sqr(p)) / (2.0f * MolMass() * wall_t_));
 
-      g = numenator2 / denominator * exp((-1.0f * p * p) / (2.0f * MolMass() * wall_t_));
+      g = numenator2 / denominator * exp((-1.0f * sep::sqr(p)) / (2.0f * MolMass() * wall_t_));
 
       neighbor_[axis].next->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));

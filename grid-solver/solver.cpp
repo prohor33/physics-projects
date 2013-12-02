@@ -13,9 +13,9 @@ string sep::int_to_string(int i) {
 
 void Solver::Compute() {
 
-  for (int i=0; i<2; i++) {
-    ComputeIteration(0.01);
-    cout << "iteration " << i << " done" << endl;
+  for (int i=0; i<1; i++) {
+    ComputeIteration(1.0); // like_a_tau = 1.0, there is also time_step = 0.02smth
+    cout << "Iteration " << i << " done." << endl;
   }
 
 }
@@ -55,11 +55,11 @@ void Solver::MakeStep(sep::Axis axis, double dt) {
 
 void Solver::ExchangeEdgeZoneHalfSpeed() {
   // TODO: to implement
-  cout << "ExchangeEdgeZoneHalfSpeed" << endl;
+  //cout << "ExchangeEdgeZoneHalfSpeed" << endl;
 }
 
 
 void Solver::ExchangeEdgeZoneSpeed() {
   // TODO: to implement
-  cout << "ExchangeEdgeZoneSpeed" << endl;
+  //cout << "ExchangeEdgeZoneSpeed" << endl;
 }
