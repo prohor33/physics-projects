@@ -34,12 +34,12 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
       if (i == 0 || i == n-1 || j == 0 || j == m-1) {
         // fake cells
 
-        cell = new Cell(sep::FIRST, Cell::FAKE);
+        cell = new Cell(gas_numb, Cell::FAKE);
       }
       else {
         // normal cells
 
-        cell = new Cell(sep::FIRST, Cell::NORMAL);
+        cell = new Cell(gas_numb, Cell::NORMAL);
 
         if (i == 1 || i == n-2 || j == 1 || j == m-2) {
           // cells with temperature

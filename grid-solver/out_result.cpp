@@ -122,3 +122,50 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
     }
   }
 }
+
+void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
+
+  vector<vector<vector<Cell*> > >::iterator cii_x;
+  vector<vector<Cell*> >::iterator cii_xy;
+  vector<Cell*>::iterator cii_xyz;
+
+  vector<double>::iterator cii;
+
+  vector<int> coord(3);
+
+  double whole_mass = 0;
+
+  for (cii_x=SOLVER->grid_->cells(gas_numb).begin();
+      cii_x!=SOLVER->grid_->cells(gas_numb).end(); ++cii_x) {
+    for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
+      for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
+
+        if ((*cii_xyz)->type() != Cell::NORMAL)
+          continue;
+
+        double n = 0.0;
+
+        // process constants
+        for (cii=(*cii_xyz)->speed_.begin();
+          cii!=(*cii_xyz)->speed_.end(); ++cii) {
+
+          coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+
+          n += (*cii_xyz)->speed(coord);
+        }
+
+        whole_mass += n;
+      }
+    }
+  }
+
+  if (whole_mass_ > 0) {
+    if (whole_mass_ != whole_mass) {
+      cout << "Error: checking mass conservation law failed." << endl;
+      cout << "Gas: " << gas_numb << endl;
+      cout << "difference = " << whole_mass - whole_mass_ << endl;
+    }
+  }
+  else
+    whole_mass_ = whole_mass;
+}

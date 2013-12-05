@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   PARAMETERS->SetTimeStep(0.02/4.8);
 
   // without second gas for a while
-  PARAMETERS->SetSecondGasIsActive(false);
+  PARAMETERS->SetSecondGasIsActive(true);
 
   MANAGER->Initialize(argc, argv);
 
@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
 
   SOLVER->Compute();
 
-  OUT_RESULT->ProcessParameters(sep::FIRST);
+  OUT_RESULT->ProcessParameters(sep::SECOND);
   OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
-  OUT_RESULT->OutParameters(sep::FIRST);
+  OUT_RESULT->OutParameters(sep::SECOND);
 
   return 0;
 }

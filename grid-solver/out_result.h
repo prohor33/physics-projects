@@ -48,9 +48,12 @@ class OutResult {
     output_type_ = output_type;
   }
 
+  void CheckMassConservation(sep::GasNumb gas_numb);
+
  private:
 
-  OutResult() {};
+  OutResult() :
+    whole_mass_(0) {};
   ~OutResult() {};
 
  protected:
@@ -58,6 +61,8 @@ class OutResult {
   OutType output_type_;
 
   vector<CellParameters> parameters_[2];  // two gases
+
+  double whole_mass_; // use for checking mass conservation law
 };
 
 #define OUT_RESULT OutResult::Instance()
