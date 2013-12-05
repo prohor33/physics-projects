@@ -41,13 +41,5 @@ void Manager::InitializeSolver() {
 }
 
 void Manager::SetParameters() {
-
-  PARAMETERS->SetMolMass(1, 2);
-  PARAMETERS->SetTimeStep(0.1);
-
-  // without second gas for a while
-  PARAMETERS->SetSecondGasIsActive(false);
-
-  OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
-
+  // we will use this function if main appear need to be clear
 }

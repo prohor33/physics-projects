@@ -20,7 +20,7 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
   // for test let's create rectangle grid n x m
   // with only one gas
   int n, m;
-  n = 10;
+  n = 6;
   m = 8;
   Cell* cell;
 
@@ -45,16 +45,13 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
           // cells with temperature
 
           if (i == 1 || i == n-2)
-            cell->wall_t() = 1.0;
-          if (j == 1 || j == m-2)
             cell->wall_t() = 0.8;
+          if (j == 1 || j == m-2)
+            cell->wall_t() = 1.2;
         }
       }
 
       cell->SetSpaceCoord(i, j, 0);
-
-//      cout << "space_coord: " << cell->space_coord()[0] << " " <<
-//          cell->space_coord()[1] << " " << cell->space_coord()[2] << " " << endl;
 
       vector<Cell*> cells_z;
       cells_z.push_back(cell);
@@ -89,7 +86,7 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
       }
     }
   }
-  cout << "============ size cells of " << gas_numb << "= " << cells_[gas_numb].size() << endl;
+  //cout << "============ size cells of " << gas_numb << "= " << cells_[gas_numb].size() << endl;
 }
 
 

@@ -41,6 +41,8 @@ class Parameters {
 
   void SetSecondGasIsActive(bool x) { second_gas_is_active_ = x; };
 
+  double time_step() { return time_step_; };
+
  protected:
 
   Parameters();

@@ -63,6 +63,8 @@ class Cell {
   inline double P(sep::Axis axis,
       vector<int> coord) const;
 
+  inline double P2(vector<int> coord) const;
+
   inline double Limiter(sep::Axis axis,
       vector<int> coord);
 

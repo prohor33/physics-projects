@@ -9,7 +9,7 @@ from pylab import *
 #r_file = file("test_T_gas0.result")
 #print r_file.readline().rsplit()[3]
 
-size_x = 10-2
+size_x = 6-2
 size_y = 8-2
 
 data = np.loadtxt("test_T_gas0.result")

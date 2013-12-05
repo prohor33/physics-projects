@@ -1,7 +1,7 @@
 #include "cell.h"
 #include "parameters.h"
 
-#include <stdlib.h>
+#include <stdlib.h> // for exit()
 
 Cell::Cell(sep::GasNumb gas_numb, CellType type) :
     gas_numb_(gas_numb),
@@ -68,6 +68,14 @@ double Cell::P(sep::Axis axis,
     vector<int> coord) const {
 
   return PARAMETERS->velocity_[coord[axis]] * MolMass();
+}
+
+double Cell::P2(vector<int> coord) const {
+
+  return (sep::sqr(PARAMETERS->velocity_[coord[sep::X]]) +
+      sep::sqr(PARAMETERS->velocity_[coord[sep::Y]]) +
+      sep::sqr(PARAMETERS->velocity_[coord[sep::Z]])) *
+      sep::sqr(MolMass());
 }
 
 double Cell::Limiter(sep::Axis axis,
@@ -216,7 +224,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
   double denominator = 0.0f;
 
   double gamma;
-  double p;
+  double p, p2;
 
   vector<int> coord(3);
   vector<double>::iterator cii;
@@ -225,6 +233,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
     coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
+    p2 = P2(coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
     // for speed < 0 with (18.5) compute prev->speed()
@@ -233,7 +242,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       denominator += fabs(p / MolMass()) *
-        exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
+        exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
     }
     else {
       // for speed < 0
@@ -271,6 +280,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
     coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
+    p2 = P2(coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
     double g;
 
@@ -278,15 +288,22 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       neighbor_[axis].prev->speed_half(coord) =
-         numenator1 / denominator * exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
+         numenator1 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
 
-      g = numenator2 / denominator * exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
+      g = numenator2 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
 
       neighbor_[axis].prev->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));
-
+//      cout << "2.0f * g - speed(coord) = " << 2.0f * g - speed(coord) << endl;
+//      cout << "2.0f * MolMass() * wall_t_ = " << 2.0f * MolMass() * wall_t_ << endl;
+//      cout << "sep::sqr(p) = " << sep::sqr(p) << endl;
+//      cout << "pow = " << (-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_) << endl;
+//      cout << "exp = " << exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_)) << endl;
+//      cout << "g = " << g << endl;
+//      cout << "speed(coord) = " << speed(coord) << endl;
       speed_half(coord) = speed(coord) +
         (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
+
     } else {
       // for speed < 0
 
@@ -304,7 +321,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
   double denominator = 0.0f;
 
   double gamma;
-  double p;
+  double p, p2;
 
   vector<int> coord(3);
   vector<double>::iterator cii;
@@ -313,6 +330,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
 
     coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
+    p2 = P2(coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
         
     if (p > 0.0f) {
@@ -334,7 +352,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       denominator += fabs(p / MolMass()) *
-              exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_));
+              exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
     }
 
   }
@@ -344,6 +362,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
 
     coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
+    p2 = P2(coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
     double g;
 
@@ -357,9 +376,9 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       speed_half(coord) = 
-        numenator1 / denominator * exp((-1.0f * sep::sqr(p)) / (2.0f * MolMass() * wall_t_));
+        numenator1 / denominator * exp((-1.0f * p2) / (2.0f * MolMass() * wall_t_));
 
-      g = numenator2 / denominator * exp((-1.0f * sep::sqr(p)) / (2.0f * MolMass() * wall_t_));
+      g = numenator2 / denominator * exp((-1.0f * p2) / (2.0f * MolMass() * wall_t_));
 
       neighbor_[axis].next->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));

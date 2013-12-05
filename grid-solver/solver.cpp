@@ -13,8 +13,8 @@ string sep::int_to_string(int i) {
 
 void Solver::Compute() {
 
-  for (int i=0; i<1; i++) {
-    ComputeIteration(1.0); // like_a_tau = 1.0, there is also time_step = 0.02smth
+  for (int i=0; i<5; i++) {
+    ComputeIteration(1.0); // like_a_tau = 1.0, because of time_step = 0.02smth
     cout << "Iteration " << i << " done." << endl;
   }
 
@@ -27,11 +27,12 @@ void Solver::ComputeIteration(double dt) {
   // but for 2D case things are simple
   // something like:
 
-  MakeStep(sep::X, dt/2);
+  MakeStep(sep::X, dt);
 
   MakeStep(sep::Y, dt);
 
-  MakeStep(sep::X, dt/2);
+  // for debug we comment it
+  //MakeStep(sep::X, dt/2);
 
 }
 
