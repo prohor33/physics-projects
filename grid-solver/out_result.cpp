@@ -28,6 +28,30 @@ void OutResult::OutParameters(sep::GasNumb gas_numb) {
   }
 
   out_T_file.close();
+
+
+  // out n
+  ofstream out_n_file;
+  out_n_file.open(string("test_n_gas" + sep::int_to_string(gas_numb) + ".result").c_str());
+
+  switch (output_type_) {
+
+  case OUT_FOR_PYTHON:
+
+    vector<CellParameters>::iterator cii;
+
+    for (cii=parameters_[gas_numb].begin();
+        cii!=parameters_[gas_numb].end(); ++cii) {
+
+      out_n_file << (*cii).coord[sep::X] << " " <<
+          (*cii).coord[sep::Y] << " " <<
+          (*cii).coord[sep::Z] << " " <<
+          (*cii).n << endl;
+    }
+    break;
+  }
+
+  out_n_file.close();
 }
 
 // prepare parameters to be printed out
@@ -62,8 +86,6 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
           coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
 
-          //cout << "n = " << n << " + " << (*cii) << endl;
-
           n += (*cii_xyz)->speed(coord);
 
           u_x += (*cii_xyz)->speed(coord) *
@@ -95,8 +117,6 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         // capacity
         T /= 3;
 
-//        cout << "fill in parameters: T = " <<
-//            T << "; n = " << n << endl;
         parameters_[gas_numb].push_back(CellParameters((*cii_xyz)->space_coord(), T, n));
       }
     }

@@ -13,17 +13,16 @@ Cell::Cell(sep::GasNumb gas_numb, CellType type) :
   double n = 1.0;
   double T_start = 1.0;
   double C = 0;
+  double p2;
 
   // process C
   for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
 
     coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
+    p2 = P2(coord);
 
     C += exp((-1.0f)*
-        (sep::sqr(P(sep::X, coord)) +
-        sep::sqr(P(sep::Y, coord)) +
-        sep::sqr(P(sep::Z, coord)) /
-      (2.0f*MolMass()*T_start)));
+        p2 / (2.0f * MolMass() * T_start));
   }
 
   /* n0 = 1.0 */
@@ -32,21 +31,17 @@ Cell::Cell(sep::GasNumb gas_numb, CellType type) :
   for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
 
     coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
+    p2 = P2(coord);
 
     speed_.push_back(n * C * exp((-1.0f)*
-        (sep::sqr(P(sep::X, coord)) +
-        sep::sqr(P(sep::Y, coord)) +
-        sep::sqr(P(sep::Z, coord))) /
-        (2.0f*MolMass()*T_start)));
-
-    //cout << "speed = " << speed_[i] << endl;
+        p2 / (2.0f * MolMass() * T_start)));
   }
 
   // initialize speed_half array
   speed_half_ = vector<double>(PARAMETERS->s_coord_map_1d_to_3d_.size());
 };
 
-double Cell::MolMass() const {
+inline double Cell::MolMass() const {
   switch(gas_numb_) {
   case 0:
     return PARAMETERS->mol_mass_gas1_;
@@ -64,7 +59,7 @@ double Cell::H() const {
   return 0.02;
 }
 
-double Cell::P(sep::Axis axis,
+inline double Cell::P(sep::Axis axis,
     vector<int> coord) const {
 
   return PARAMETERS->velocity_[coord[axis]] * MolMass();
@@ -129,7 +124,7 @@ double Cell::Limiter(sep::Axis axis,
   return 0;
 }
 
-vector<int> Cell::GetSpeedCoord(int index) {
+inline vector<int> Cell::GetSpeedCoord(int index) {
 
   if (index > PARAMETERS->s_coord_map_1d_to_3d_.size()-1) {
 
