@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   PARAMETERS->SetTimeStep(0.02/4.8);
 
   // without second gas for a while
-  PARAMETERS->SetSecondGasIsActive(true);
+  PARAMETERS->SetSecondGasIsActive(false);
 
   PARAMETERS->SetUseCheckingMassConservation(false); // 1e-13 now
 
@@ -23,9 +23,9 @@ int main(int argc, char *argv[]) {
 
   SOLVER->Compute();
 
-  OUT_RESULT->ProcessParameters(sep::SECOND);
+  OUT_RESULT->ProcessParameters(sep::FIRST);
   OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
-  OUT_RESULT->OutParameters(sep::SECOND);
+  OUT_RESULT->OutParameters(sep::FIRST);
 
   return 0;
 }

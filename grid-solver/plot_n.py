@@ -12,7 +12,7 @@ from pylab import *
 size_x = 6-2
 size_y = 8-2
 
-data = np.loadtxt("test_n_gas1.result")
+data = np.loadtxt("test_n_gas0.result")
 X = data[:,0].reshape(size_x, size_y)
 Y = data[:,1].reshape(size_x, size_y)
 Z = data[:,3].reshape(size_x, size_y)
