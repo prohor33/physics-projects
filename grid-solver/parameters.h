@@ -46,9 +46,15 @@ class Parameters {
   void SetUseCheckingMassConservation(bool x) {
     use_checking_mass_conservation_ = x;
   }
-
   bool GetUseCheckingMassConservation() {
     return use_checking_mass_conservation_;
+  }
+
+  void SetUseZAxis(bool x) {
+    use_z_axis_ = x;
+  }
+  bool GetUseZAxis() {
+    return use_z_axis_;
   }
 
  protected:
@@ -71,6 +77,7 @@ class Parameters {
 
   bool use_checking_mass_conservation_;
 
+  bool use_z_axis_;
 };
 
 #define PARAMETERS Parameters::Instance()

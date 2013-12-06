@@ -1,5 +1,6 @@
 #include "solver.h"
 #include "out_result.h"
+#include "parameters.h"
 
 string sep::int_to_string(int i) {
 
@@ -29,14 +30,14 @@ void Solver::ComputeIteration(double dt) {
 
   // here we should have some magic for 3D case, I  guess
   // but for 2D case things are simple
-  // something like:
+  // something like: dt/2 - x, dt - y, dt/2 - x
 
   MakeStep(sep::X, dt);
 
   MakeStep(sep::Y, dt);
 
-  // for debug we comment it
-  //MakeStep(sep::X, dt/2);
+  if (PARAMETERS->GetUseZAxis())
+    MakeStep(sep::Z, dt);
 
 }
 

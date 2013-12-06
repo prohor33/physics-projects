@@ -7,6 +7,12 @@
 
 void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
+  int z_layer = 3;
+
+  z_layer = PARAMETERS->GetUseZAxis() ? z_layer : 0;
+
+  vector<Cell*> cells_z;
+
   // out T
   ofstream out_T_file;
   out_T_file.open(string("test_T_gas" + sep::int_to_string(gas_numb) + ".result").c_str());
@@ -19,6 +25,9 @@ void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
     for (cii=parameters_[gas_numb].begin();
         cii!=parameters_[gas_numb].end(); ++cii) {
+
+      if ((*cii).coord[sep::Z] != z_layer)
+        continue;
 
       out_T_file << (*cii).coord[sep::X] << " " <<
           (*cii).coord[sep::Y] << " " <<
@@ -43,6 +52,9 @@ void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
     for (cii=parameters_[gas_numb].begin();
         cii!=parameters_[gas_numb].end(); ++cii) {
+
+      if ((*cii).coord[sep::Z] != z_layer)
+        continue;
 
       out_n_file << (*cii).coord[sep::X] << " " <<
           (*cii).coord[sep::Y] << " " <<

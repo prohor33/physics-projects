@@ -15,6 +15,8 @@ int main(int argc, char *argv[]) {
 
   PARAMETERS->SetUseCheckingMassConservation(false); // 1e-13 now
 
+  PARAMETERS->SetUseZAxis(false);
+
   MANAGER->Initialize(argc, argv);
 
   cout << "initialization complete" << endl;
