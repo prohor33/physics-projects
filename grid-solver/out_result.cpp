@@ -2,6 +2,7 @@
 #include "solver.h"
 #include "grid.h"
 #include "cell.h"
+#include "parameters.h"
 
 
 void OutResult::OutParameters(sep::GasNumb gas_numb) {
@@ -124,6 +125,9 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 }
 
 void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
+
+  if (!PARAMETERS->GetUseCheckingMassConservation())
+    return;
 
   vector<vector<vector<Cell*> > >::iterator cii_x;
   vector<vector<Cell*> >::iterator cii_xy;

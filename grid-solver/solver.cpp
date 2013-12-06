@@ -16,7 +16,7 @@ void Solver::Compute() {
 
   OUT_RESULT->CheckMassConservation(sep::FIRST);
 
-  for (int i=0; i<5; i++) {
+  for (int i=0; i<1; i++) {
     ComputeIteration(1.0); // like_a_tau = 1.0, because of time_step = 0.02smth
     cout << "Iteration " << i << " done." << endl;
   }

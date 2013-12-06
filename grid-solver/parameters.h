@@ -43,6 +43,14 @@ class Parameters {
 
   double time_step() { return time_step_; };
 
+  void SetUseCheckingMassConservation(bool x) {
+    use_checking_mass_conservation_ = x;
+  }
+
+  bool GetUseCheckingMassConservation() {
+    return use_checking_mass_conservation_;
+  }
+
  protected:
 
   Parameters();
@@ -60,6 +68,8 @@ class Parameters {
 
   map<int, vector<int> > s_coord_map_1d_to_3d_;
   map<vector<int>, int> s_coord_map_3d_to_1d_;
+
+  bool use_checking_mass_conservation_;
 
 };
 

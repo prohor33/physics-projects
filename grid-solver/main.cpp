@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
   // without second gas for a while
   PARAMETERS->SetSecondGasIsActive(true);
 
+  PARAMETERS->SetUseCheckingMassConservation(false); // 1e-13 now
+
   MANAGER->Initialize(argc, argv);
 
   cout << "initialization complete" << endl;
