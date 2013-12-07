@@ -24,6 +24,7 @@ project.properties
 # CMake
 CMakeFiles
 Makefile
+CMakeCache.txt
 cmake_install.cmake
 install_manifest.txt
 
