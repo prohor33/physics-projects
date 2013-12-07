@@ -15,6 +15,9 @@ void Manager::Initialize(int argc, char *argv[]) {
   MPI_Comm_rank (MPI_COMM_WORLD, &rank);  /* get current process id */
   MPI_Comm_size (MPI_COMM_WORLD, &size);  /* get number of processes */
 
+  cout << "number of processes = " << size << endl;
+  cout << "current process id = " << rank << endl;
+
   PARAMETERS->SetProcessID(rank);
 
   InitializeSolver();
