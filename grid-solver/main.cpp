@@ -17,6 +17,8 @@ int main(int argc, char *argv[]) {
 
   PARAMETERS->SetUseZAxis(false);
 
+  PARAMETERS->SetGridFromInputFile(true);
+
   MANAGER->Initialize(argc, argv);
 
   cout << "initialization complete" << endl;

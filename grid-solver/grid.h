@@ -7,7 +7,13 @@
 class Grid {
 
  public:
+
+  // for initialization grid without file (singleton mode)
   Grid();
+
+  // for initialization grid from file
+  Grid(std::string, std::vector<int> grid_start, std::vector<int> size);
+
   ~Grid() {};
 
   void ComputeHalfSpeed(sep::Axis axis, double dt);
@@ -21,6 +27,13 @@ class Grid {
   }
 
  private:
+
+  void InitGasCells(
+      sep::GasNumb gas_number,
+      std::string,
+      std::vector<int> grid_start,
+      std::vector<int> size
+      );
 
   void InitGasCells(sep::GasNumb gas_number);
 

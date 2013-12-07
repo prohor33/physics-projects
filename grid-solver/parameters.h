@@ -57,6 +57,20 @@ class Parameters {
     return use_z_axis_;
   }
 
+  void SetUseParallelComputing(bool x) {
+    use_parallel_computing_ = x;
+  }
+  bool GetUseParallelComputing() {
+    return use_parallel_computing_;
+  }
+
+  void SetGridFromInputFile(bool x) {
+    use_grid_from_input_file_ = x;
+  }
+  bool GetGridFromInputFile() {
+    return use_grid_from_input_file_;
+  }
+
  protected:
 
   Parameters();
@@ -78,6 +92,10 @@ class Parameters {
   bool use_checking_mass_conservation_;
 
   bool use_z_axis_;
+
+  bool use_parallel_computing_;
+
+  bool use_grid_from_input_file_;
 };
 
 #define PARAMETERS Parameters::Instance()
