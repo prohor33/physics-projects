@@ -30,3 +30,6 @@ install_manifest.txt
 
 # Directories wich shouldn't be tracked by Git
 mpi-example/
+
+# Grid config files
+*.grid

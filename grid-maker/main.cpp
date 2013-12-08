@@ -4,5 +4,8 @@
 int main() {
 
   GRID_MAKER->BuildCubeGrid();
+
+  GRID_MAKER->OutToFile("cube.grid");
+
   return 0;
 }

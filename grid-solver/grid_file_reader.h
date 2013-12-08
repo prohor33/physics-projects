@@ -1,5 +1,5 @@
-#ifndef GRID_MAKER_
-#define GRID_MAKER_
+#ifndef GRID_FILE_READER_
+#define GRID_FILE_READER_
 
 #include "main.h"
 
@@ -26,7 +26,7 @@ class GridDataSplitter {
 
   GridDataSplitter() {};
   GridDataSplitter(GridDataSplitterType type) :
-  type(type) {};
+  type() {};
 
   ~GridDataSplitter() {};
 
@@ -39,7 +39,7 @@ class CellInitData {
  public:
 
   enum CellInitDataType {
-    CIDT_NULL,
+    CIDT_NONE,
     CIDT_NORMAL,
     CIDT_FAKE
   };
@@ -58,29 +58,33 @@ class CellInitData {
 };
 
 
-class GridMaker {
+class GridFileReader {
 
  public:
 
-  static GridMaker* Instance() {
-    static GridMaker GridMaker_;
-    return &GridMaker_;
+  static GridFileReader* Instance() {
+    static GridFileReader GridFileReader_;
+    return &GridFileReader_;
   }
 
-  void BuildCubeGrid();
+  void ReadFile(std::string file_name);
 
-  void OutToFile(std::string file_name);
+  std::vector<std::vector<std::vector<CellInitData*> > > cells() {
+    return cells_;
+  }
+
+  GridConfig* grid_config() { return  grid_config_; };
 
  private:
 
-  GridMaker() {};
-  ~GridMaker() {};
+  GridFileReader() {};
+  ~GridFileReader() {};
 
   std::vector<std::vector<std::vector<CellInitData*> > > cells_;
 
   GridConfig* grid_config_;
 };
 
-#define GRID_MAKER GridMaker::Instance()
+#define GRID_FILE_READER GridFileReader::Instance()
 
-#endif // GRID_MAKER_
+#endif // GRID_FILE_READER_

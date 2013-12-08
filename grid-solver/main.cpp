@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
   PARAMETERS->SetUseCheckingMassConservation(false); // 1e-13 now
 
-  PARAMETERS->SetUseZAxis(false);
+  PARAMETERS->SetUseZAxis(true);
 
   PARAMETERS->SetGridFromInputFile(true);
 

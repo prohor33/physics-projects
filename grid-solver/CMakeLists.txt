@@ -9,6 +9,7 @@ cmake_minimum_required(VERSION 2.6)
   SET(SOURCES
           main.cpp
           cell.cpp
+          grid_file_reader.cpp
           grid.cpp
           manager.cpp
           out_result.cpp

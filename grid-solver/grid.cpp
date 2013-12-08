@@ -1,6 +1,7 @@
 #include "grid.h"
 #include "cell.h"
 #include "parameters.h"
+#include "grid_file_reader.h"
 
 
 Grid::Grid() {
@@ -22,8 +23,10 @@ Grid::Grid(
   // initialize cells for first gas
   InitGasCells(sep::FIRST, file_name, grid_start, size);
 
-  // initialize cells for second gas
-  InitGasCells(sep::SECOND, file_name, grid_start, size);
+  if (PARAMETERS->GetSecondGasIsActive()) {
+    // initialize cells for second gas
+    InitGasCells(sep::SECOND, file_name, grid_start, size);
+  }
 }
 
 
@@ -34,16 +37,17 @@ void Grid::InitGasCells(
     std::vector<int> size
     ) {
 
-  // TODO: here we should read the file
+  // TODO: we should initialize only grid for that process
+
+  GRID_FILE_READER->ReadFile(file_name);
 
   vector<vector<vector<Cell*> > >& cells = cells_[gas_numb];
 
-  // for test let's create rectangle grid n x m
-  // with only one gas
   int n, m, p;
-  n = 6;
-  m = 8;
-  p = 5;
+
+  n = GRID_FILE_READER->grid_config()->size[sep::X];
+  m = GRID_FILE_READER->grid_config()->size[sep::Y];
+  p = GRID_FILE_READER->grid_config()->size[sep::Z];
   Cell* cell;
 
   p = PARAMETERS->GetUseZAxis() ? p : 1;
@@ -59,36 +63,37 @@ void Grid::InitGasCells(
 
       for (int k=0; k<p; k++) {
 
-        if (i == 0 || i == n-1 ||
-            j == 0 || j == m-1 ||
-            ((k == 0 || k == p-1) && PARAMETERS->GetUseZAxis())) {
-          // fake cells
+        switch (GRID_FILE_READER->cells()[i][j][k]->type) {
+        case CellInitData::CIDT_NONE:
+          cells_z.push_back(NULL);
+          cout << "Warning: Empty cell is created" << endl;
+          break;
+        case CellInitData::CIDT_NORMAL:
+        case CellInitData::CIDT_FAKE:
 
-          cell = new Cell(gas_numb, Cell::FAKE);
+          if (GRID_FILE_READER->cells()[i][j][k]->type == CellInitData::CIDT_NORMAL)
+            cell = new Cell(gas_numb, Cell::NORMAL);
+          else
+            cell = new Cell(gas_numb, Cell::FAKE);
+
+          // TODO: here we have temperature intersections on different axis
+          if (i == 1 || i == n-2)
+            cell->wall_t() = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::X];
+          if (j == 1 || j == m-2)
+            cell->wall_t() = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Y];
+          if (k == 1 || k == p-2)
+            cell->wall_t() = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Z];
+
+
+          cell->SetSpaceCoord(i, j, k);
+
+          cells_z.push_back(cell);
+          break;
+        default:
+          cout << "Error: get wrong cell type during reading input file" << endl;
+          return;
+          break;
         }
-        else {
-          // normal cells
-
-          cell = new Cell(gas_numb, Cell::NORMAL);
-
-          if (i == 1 || i == n-2 ||
-              j == 1 || j == m-2 ||
-              k == 1 || k == p-2) {
-            // cells with temperature
-
-            // TODO: here we have temperature intersections on different axis
-            if (i == 1 || i == n-2)
-              cell->wall_t() = 0.8;
-            if (j == 1 || j == m-2)
-              cell->wall_t() = 1.2;
-            if (k == 1 || k == p-2)
-              cell->wall_t() = 0.7;
-          }
-        }
-
-        cell->SetSpaceCoord(i, j, k);
-
-        cells_z.push_back(cell);
       }
 
       cells_yz.push_back(cells_z);

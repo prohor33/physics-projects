@@ -8,7 +8,6 @@ Cell::Cell(sep::GasNumb gas_numb, CellType type) :
     type_(type)
   {
 
-  // TODO: make it Gauss function
   vector<int> coord;
   double n = 1.0;
   double T_start = 1.0;
