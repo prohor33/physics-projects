@@ -17,10 +17,11 @@ Grid Solver
 ####What we need to do:
 1. Read/write grid config functions
 2. Build our final grid in 3D, but with small sizes (like 30x10x6) to show the results to Cheremisin
-3. Parallel our solver with MPI
-4. Optimize the solver and compute bigger grids
-5. Develop more beautifull plots
-6. Maybe draw some 3D plots with OSG
+3. Add ability of using symmerty
+4. Parallel our solver with MPI
+5. Optimize the solver and compute bigger grids
+6. Develop more beautifull plots
+7. Maybe draw some 3D plots with OSG
 
 Grid Maker
 ----------------
