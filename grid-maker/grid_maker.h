@@ -67,9 +67,15 @@ class GridMaker {
     return &GridMaker_;
   }
 
+  void FillInGridWithNulls(int n, int m, int p);
+
   void BuildCubeGrid();
 
+  void BuildOurMainGrid();
+
   void OutToFile(std::string file_name);
+
+  void AddBox(std::vector<int> start, std::vector<int> size);
 
  private:
 
