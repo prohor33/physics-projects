@@ -76,13 +76,12 @@ void Grid::InitGasCells(
           else
             cell = new Cell(gas_numb, Cell::FAKE);
 
-          // TODO: here we have temperature intersections on different axis
           if (i == 1 || i == n-2)
-            cell->wall_t() = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::X];
+            cell->wall_t()[sep::X] = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::X];
           if (j == 1 || j == m-2)
-            cell->wall_t() = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Y];
+            cell->wall_t()[sep::Y] = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Y];
           if (k == 1 || k == p-2)
-            cell->wall_t() = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Z];
+            cell->wall_t()[sep::Z] = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Z];
 
 
           cell->SetSpaceCoord(i, j, k);
@@ -176,13 +175,12 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
               k == 1 || k == p-2) {
             // cells with temperature
 
-            // TODO: here we have temperature intersections on different axis
             if (i == 1 || i == n-2)
-              cell->wall_t() = 0.8;
+              cell->wall_t()[sep::X] = 0.8;
             if (j == 1 || j == m-2)
-              cell->wall_t() = 1.2;
+              cell->wall_t()[sep::Y] = 1.2;
             if (k == 1 || k == p-2)
-              cell->wall_t() = 0.7;
+              cell->wall_t()[sep::Z] = 0.7;
           }
         }
 

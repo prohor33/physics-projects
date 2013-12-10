@@ -8,6 +8,8 @@ Cell::Cell(sep::GasNumb gas_numb, CellType type) :
     type_(type)
   {
 
+  wall_t_ = vector<double>(3);
+
   vector<int> coord;
   double n = 1.0;
   double T_start = 1.0;
@@ -95,16 +97,11 @@ double Cell::Limiter(sep::Axis axis,
     break;
 
   case sep::MC:
-//    cout << "val = " << val << endl;
-//    cout << "next = " << next << endl;
-//    cout << "prev = " << prev << endl;
-    a = sep::min(
+    return sep::min(
         sep::min(sep::module(next - prev) / 2.0f,
         2.0f * sep::module(next - val)),
         2.0f * sep::module(val - prev)) *
         sep::sign(next - val);
-    //cout << "limiter = " << a << endl;
-    return a;
     break;
 
   case sep::STRANGE:
@@ -236,7 +233,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       denominator += fabs(p / MolMass()) *
-        exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
+        exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_[axis]));
     }
     else {
       // for speed < 0
@@ -282,9 +279,9 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       neighbor_[axis].prev->speed_half(coord) =
-         numenator1 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
+         numenator1 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_[axis]));
 
-      g = numenator2 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
+      g = numenator2 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_[axis]));
 
       neighbor_[axis].prev->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));
@@ -346,7 +343,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       denominator += fabs(p / MolMass()) *
-              exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_));
+              exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_[axis]));
     }
 
   }
@@ -370,9 +367,9 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       speed_half(coord) = 
-        numenator1 / denominator * exp((-1.0f * p2) / (2.0f * MolMass() * wall_t_));
+        numenator1 / denominator * exp((-1.0f * p2) / (2.0f * MolMass() * wall_t_[axis]));
 
-      g = numenator2 / denominator * exp((-1.0f * p2) / (2.0f * MolMass() * wall_t_));
+      g = numenator2 / denominator * exp((-1.0f * p2) / (2.0f * MolMass() * wall_t_[axis]));
 
       neighbor_[axis].next->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));

@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   // without second gas for a while
   PARAMETERS->SetSecondGasIsActive(false);
 
-  PARAMETERS->SetUseCheckingMassConservation(false); // 1e-13 now
+  PARAMETERS->SetUseCheckingMassConservation(false); // delta is 1e-13 now
 
   PARAMETERS->SetUseZAxis(true);
 

@@ -74,7 +74,7 @@ class Cell {
 
   CellType type() { return type_; };
 
-  double& wall_t() { return wall_t_; };
+  vector<double>& wall_t() { return wall_t_; };
 
   void SetNeighbors(CellNeighbor x, CellNeighbor y, CellNeighbor z) {
     neighbor_.clear();
@@ -103,7 +103,7 @@ class Cell {
 
   vector<int> space_coord_;
 
-  double wall_t_;
+  vector<double> wall_t_; // for different axes
 };
 
 #endif // _CELL_H_
