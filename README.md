@@ -17,6 +17,11 @@ Grid Solver
 
 ####What we need to do:
 1. Build our final grid in 3D, but with small sizes (like 30x10x6) to show the results to Cheremisin
+
+Some demo result:
+
+![image](https://dl.dropboxusercontent.com/u/59969938/Images/snap.png)
+
 2. Add colision integral
 3. Add ability of using symmerty
 4. Parallel our solver with MPI
