@@ -20,19 +20,15 @@ Z = data[:,3].reshape(size_x, size_y)
 for i in range(0, size_x):
   for j in range(0, size_y):
     if Z[i,j] == 0:
-      Z[i,j] = nan
-
-Z = np.ma.masked_invalid(Z)
+      Z[i,j] = np.nan
 
 #plt.figure(figsize=(34.7/2.54, (size_x+50)/size_y*27.75/2.54)) # in santimeters                    
 
 #im = imshow(Z)
 
-fig, ax = plt.subplots()
-
-p = ax.pcolormesh(X, Y, Z, cmap=cm.jet, vmin=Z.min(),
-                vmax=Z.max(), edgecolors = 'None')
-cb = fig.colorbar(p, ax=ax)
+fig = plt.figure()
+ax = p3.Axes3D(fig)
+ax.plot_wireframe(X, Y, Z, rstride=1, cstride=1)
 
 #im.set_interpolation('none')
 #im.set_clim(0.8, 1.0)
