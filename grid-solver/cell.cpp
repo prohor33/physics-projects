@@ -3,6 +3,21 @@
 
 #include <stdlib.h> // for exit()
 
+CellNeighbor::CellNeighbor(
+    Cell* next_c,
+    Cell* prev_c
+    ) :
+    next(next_c),
+    prev(prev_c)
+{
+  // some cheat, but we strongly need it
+  if (next && next->type() == Cell::NONE)
+    next = NULL;
+
+  if (prev && prev->type() == Cell::NONE)
+    prev = NULL;
+};
+
 Cell::Cell(sep::GasNumb gas_numb, CellType type) :
     gas_numb_(gas_numb),
     type_(type)
@@ -11,6 +26,10 @@ Cell::Cell(sep::GasNumb gas_numb, CellType type) :
   wall_t_ = vector<double>(3);
 
   vector<int> coord;
+
+  if (type_ == NONE)  // empty cell
+    return;
+
   double n = 1.0;
   double T_start = 1.0;
   double C = 0;
@@ -140,29 +159,29 @@ int Cell::GetIndex(vector<int> coord) {
 
 void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
-  if (type_ == FAKE || type_ == OBTAINED) {
+  if (type_ != NORMAL) {
     return;
   }
 
-	if (!neighbor_[axis].next->neighbor_[axis].next) {
-	  ComputeHalfSpeedNextIsBorder(axis, dt);
-	  return;
-	}
+  if (!neighbor_[axis].next->neighbor_[axis].next) {
+    ComputeHalfSpeedNextIsBorder(axis, dt);
+    return;
+  }
 
-	if (!neighbor_[axis].prev->neighbor_[axis].prev) {
-	  ComputeHalfSpeedPrevIsBorder(axis, dt);
-	  return;
-	}
+  if (!neighbor_[axis].prev->neighbor_[axis].prev) {
+    ComputeHalfSpeedPrevIsBorder(axis, dt);
+    return;
+  }
 
-	double gamma;
-	double p;
+  double gamma;
+  double p;
 
-	vector<int> coord(3);
-	vector<double>::iterator cii;
+  vector<int> coord(3);
+  vector<double>::iterator cii;
 
-	for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
-	  coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
+    coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
     p = P(axis, coord);
     gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
@@ -185,7 +204,7 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
 void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
-  if (type_ == FAKE || type_ == OBTAINED) {
+  if (type_ != NORMAL) {
     return;
   }
 

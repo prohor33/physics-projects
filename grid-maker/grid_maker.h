@@ -75,7 +75,8 @@ class GridMaker {
 
   void OutToFile(std::string file_name);
 
-  void AddBox(std::vector<int> start, std::vector<int> size);
+  void AddBox(std::vector<int> start, std::vector<int> size,
+      double T_start, std::vector<bool> without_fakes);
 
  private:
 

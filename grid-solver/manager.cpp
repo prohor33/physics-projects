@@ -47,7 +47,7 @@ void Manager::InitializeSolver() {
   grid_start[sep::Z] = 10;
 
   if (PARAMETERS->GetGridFromInputFile())
-    SOLVER->grid_ = new Grid("cube.grid", grid_start, grid_size);
+    SOLVER->grid_ = new Grid("our_small.grid", grid_start, grid_size);
   else
     SOLVER->grid_ = new Grid();
 

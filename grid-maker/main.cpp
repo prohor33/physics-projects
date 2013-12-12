@@ -3,9 +3,11 @@
 
 int main() {
 
-  GRID_MAKER->BuildCubeGrid();
+  //GRID_MAKER->BuildCubeGrid();
 
-  GRID_MAKER->OutToFile("cube.grid");
+  GRID_MAKER->BuildOurMainGrid();
+
+  GRID_MAKER->OutToFile("our_small.grid");
 
   return 0;
 }

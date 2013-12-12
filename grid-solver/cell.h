@@ -10,10 +10,7 @@ struct CellNeighbor {
   CellNeighbor(
       Cell* next,
       Cell* prev
-      ) :
-      next(next),
-      prev(prev)
-  {};
+      );
 
 public:
   Cell *next;
@@ -29,9 +26,10 @@ class Cell {
  public:
 
   enum CellType {
-    NORMAL = 0,
-    FAKE = 1,
-    OBTAINED = 2
+    NONE = 0,
+    NORMAL = 1,
+    FAKE = 2,
+    OBTAINED = 3
   };
 
   Cell(sep::GasNumb gas_numb, CellType type=NORMAL);

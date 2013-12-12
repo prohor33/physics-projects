@@ -62,7 +62,8 @@ void GridFileReader::ReadFile(std::string file_name) {
         fread(grid_data_splitter,
             sizeof(GridDataSplitter), 1, f);
 
-        if (grid_data_splitter->type != GridDataSplitter::GDST_NEXT_IS_CELL_DATA) {
+        if (grid_data_splitter->type !=
+            GridDataSplitter::GDST_NEXT_IS_CELL_DATA) {
           cout << "Error: next data is not cell data" << endl;
           return;
         }

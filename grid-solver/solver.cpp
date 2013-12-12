@@ -17,10 +17,16 @@ void Solver::Compute() {
 
   OUT_RESULT->CheckMassConservation(sep::FIRST);
 
-  for (int i=0; i<1; i++) {
+  MeasureTime();
+
+  int iterations = 1;
+
+  for (int i=0; i<iterations; i++) {
     ComputeIteration(1.0); // like_a_tau = 1.0, because of time_step = 0.02smth
     cout << "Iteration " << i << " done." << endl;
   }
+
+  MeasureTime(iterations);
 
   OUT_RESULT->CheckMassConservation(sep::FIRST);
 }
@@ -68,4 +74,29 @@ void Solver::ExchangeEdgeZoneHalfSpeed() {
 void Solver::ExchangeEdgeZoneSpeed() {
   // TODO: to implement
   //cout << "ExchangeEdgeZoneSpeed" << endl;
+}
+
+void Solver::MeasureTime(int iterations) {
+
+  static bool start = true;
+
+  if (start) {
+
+    start = false;
+
+    start_computing_ = clock();
+  } else {
+    // end of computing
+
+    double time = float(clock () - start_computing_) /  CLOCKS_PER_SEC;
+
+    cout << "Taken time: " << (int)(time/60.0) << " m " <<
+      ((int)time)%60 << " s." << endl;
+
+    time /= whole_quantity_of_cells_; // second per cell
+    time *= 1000.0 / iterations;  // 1000 iterations per cell
+
+    cout << "Time for 1 cell x1000 iteration: " << (int)(time/60.0) << " m " <<
+      ((int)time)%60 << " s." << endl;
+  }
 }

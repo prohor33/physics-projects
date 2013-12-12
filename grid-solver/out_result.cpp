@@ -7,7 +7,7 @@
 
 void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
-  int z_layer = 3;
+  int z_layer = 5;
 
   z_layer = PARAMETERS->GetUseZAxis() ? z_layer : 0;
 
@@ -15,7 +15,8 @@ void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
   // out T
   ofstream out_T_file;
-  out_T_file.open(string("test_T_gas" + sep::int_to_string(gas_numb) + ".result").c_str());
+  out_T_file.open(string("test_T_gas" + sep::int_to_string(gas_numb) +
+        ".result").c_str());
 
   switch (output_type_) {
 
@@ -42,7 +43,8 @@ void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
   // out n
   ofstream out_n_file;
-  out_n_file.open(string("test_n_gas" + sep::int_to_string(gas_numb) + ".result").c_str());
+  out_n_file.open(string("test_n_gas" + sep::int_to_string(gas_numb) +
+        ".result").c_str());
 
   switch (output_type_) {
 
@@ -83,8 +85,13 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
     for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
       for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
 
-        if ((*cii_xyz)->type() != Cell::NORMAL)
+        if ((*cii_xyz)->type() != Cell::NORMAL) {
+
+          parameters_[gas_numb].push_back(
+            CellParameters((*cii_xyz)->space_coord(), 0.0, 0.0));
+
           continue;
+        }
 
         // process T
         double n = 0.0;
@@ -97,7 +104,8 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         for (cii=(*cii_xyz)->speed_.begin();
           cii!=(*cii_xyz)->speed_.end(); ++cii) {
 
-          coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+          coord =
+            (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
 
           n += (*cii_xyz)->speed(coord);
 
@@ -117,12 +125,16 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         for (cii=(*cii_xyz)->speed_.begin();
           cii!=(*cii_xyz)->speed_.end(); ++cii) {
 
-          coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+          coord =
+            (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
 
           T += (*cii_xyz)->MolMass() *
-              (sep::sqr((*cii_xyz)->P(sep::X, coord) / (*cii_xyz)->MolMass() - u_x)+
-              sep::sqr((*cii_xyz)->P(sep::Y, coord) / (*cii_xyz)->MolMass() - u_y)+
-              sep::sqr((*cii_xyz)->P(sep::Z, coord) / (*cii_xyz)->MolMass() - u_z)) *
+              (sep::sqr((*cii_xyz)->P(sep::X, coord) /
+                        (*cii_xyz)->MolMass() - u_x)+
+              sep::sqr((*cii_xyz)->P(sep::Y, coord) /
+                (*cii_xyz)->MolMass() - u_y)+
+              sep::sqr((*cii_xyz)->P(sep::Z, coord) /
+                (*cii_xyz)->MolMass() - u_z)) *
               (*cii_xyz)->speed(coord);
         }
 
@@ -130,7 +142,8 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         // capacity
         T /= 3;
 
-        parameters_[gas_numb].push_back(CellParameters((*cii_xyz)->space_coord(), T, n));
+        parameters_[gas_numb].push_back(
+            CellParameters((*cii_xyz)->space_coord(), T, n));
       }
     }
   }
@@ -165,7 +178,8 @@ void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
         for (cii=(*cii_xyz)->speed_.begin();
           cii!=(*cii_xyz)->speed_.end(); ++cii) {
 
-          coord = (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+          coord = (*cii_xyz)->GetSpeedCoord(
+              (int)(cii-(*cii_xyz)->speed_.begin()));
 
           n += (*cii_xyz)->speed(coord);
         }

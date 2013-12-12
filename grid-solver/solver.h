@@ -59,6 +59,12 @@ class Solver {
     neighbors_.push_back(z);
   }
 
+  void SetWholeCellsQuantity(int x) {
+    whole_quantity_of_cells_ = x;
+  }
+
+ void MeasureTime(int iterations=0);
+
  private:
 
   Solver() {};
@@ -69,6 +75,10 @@ class Solver {
   Grid* grid_;
 
   vector<GridNeighbor> neighbors_; // for x, y, z
+
+  clock_t start_computing_;
+
+  int whole_quantity_of_cells_;
 
 };
 

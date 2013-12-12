@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
@@ -9,21 +9,27 @@ from pylab import *
 #r_file = file("test_T_gas0.result")
 #print r_file.readline().rsplit()[3]
 
-size_x = 6-2
-size_y = 8-2
+size_x = 35
+size_y = 25
 
 data = np.loadtxt("test_T_gas0.result")
+
 X = data[:,0].reshape(size_x, size_y)
 Y = data[:,1].reshape(size_x, size_y)
 Z = data[:,3].reshape(size_x, size_y)
+
+for i in range(0, size_x):
+  for j in range(0, size_y):
+    if Z[i,j] == 0:
+      Z[i,j] = np.nan
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 #X, Y, Z = axes3d.get_test_data(0.05)
 ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.3)
-cset = ax.contourf(X, Y, Z, zdir='z', offset=0.5, cmap=cm.coolwarm)
-cset = ax.contourf(X, Y, Z, zdir='x', offset=size_x, cmap=cm.coolwarm)
-cset = ax.contourf(X, Y, Z, zdir='y', offset=size_y, cmap=cm.coolwarm)
+#cset = ax.contourf(X, Y, Z, zdir='z', offset=0.5, cmap=cm.coolwarm)
+#cset = ax.contourf(X, Y, Z, zdir='x', offset=size_x, cmap=cm.coolwarm)
+#cset = ax.contourf(X, Y, Z, zdir='y', offset=size_y, cmap=cm.coolwarm)
 
 ax.set_xlabel('X')
 ax.set_xlim(1, size_x)

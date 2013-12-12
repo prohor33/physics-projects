@@ -2,6 +2,7 @@
 #include "cell.h"
 #include "parameters.h"
 #include "grid_file_reader.h"
+#include "solver.h"
 
 
 Grid::Grid() {
@@ -48,6 +49,9 @@ void Grid::InitGasCells(
   n = GRID_FILE_READER->grid_config()->size[sep::X];
   m = GRID_FILE_READER->grid_config()->size[sep::Y];
   p = GRID_FILE_READER->grid_config()->size[sep::Z];
+
+  SOLVER->SetWholeCellsQuantity(n * m * p);
+
   Cell* cell;
 
   p = PARAMETERS->GetUseZAxis() ? p : 1;
@@ -65,23 +69,30 @@ void Grid::InitGasCells(
 
         switch (GRID_FILE_READER->cells()[i][j][k]->type) {
         case CellInitData::CIDT_NONE:
-          cells_z.push_back(NULL);
-          cout << "Warning: Empty cell is created" << endl;
+
+          cell = new Cell(gas_numb, Cell::NONE);
+
+          cell->SetSpaceCoord(i, j, k);
+
+          cells_z.push_back(cell);
+          //cout << "Warning: Empty cell is created" << endl;
           break;
+
         case CellInitData::CIDT_NORMAL:
         case CellInitData::CIDT_FAKE:
 
-          if (GRID_FILE_READER->cells()[i][j][k]->type == CellInitData::CIDT_NORMAL)
+          if (GRID_FILE_READER->cells()[i][j][k]->type ==
+              CellInitData::CIDT_NORMAL)
             cell = new Cell(gas_numb, Cell::NORMAL);
           else
             cell = new Cell(gas_numb, Cell::FAKE);
 
-          if (i == 1 || i == n-2)
-            cell->wall_t()[sep::X] = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::X];
-          if (j == 1 || j == m-2)
-            cell->wall_t()[sep::Y] = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Y];
-          if (k == 1 || k == p-2)
-            cell->wall_t()[sep::Z] = GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Z];
+          cell->wall_t()[sep::X] =
+            GRID_FILE_READER->cells()[i][j][k]->T_start[sep::X];
+          cell->wall_t()[sep::Y] =
+            GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Y];
+          cell->wall_t()[sep::Z] =
+            GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Z];
 
 
           cell->SetSpaceCoord(i, j, k);
@@ -89,7 +100,8 @@ void Grid::InitGasCells(
           cells_z.push_back(cell);
           break;
         default:
-          cout << "Error: get wrong cell type during reading input file" << endl;
+          cout << "Error: get wrong cell type during reading input file" <<
+            endl;
           return;
           break;
         }

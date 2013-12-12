@@ -131,7 +131,8 @@ void GridMaker::OutToFile(std::string file_name) {
 
 
 // Add box with fake cells around it
-void GridMaker::AddBox(vector<int> start, vector<int> size) {
+void GridMaker::AddBox(vector<int> start, vector<int> size,
+   double T_start, vector<bool> without_fakes) {
 
   int n, m, p;
   n = start[sep::X] + size[sep::X];
@@ -151,7 +152,13 @@ void GridMaker::AddBox(vector<int> start, vector<int> size) {
             k == start[sep::Z] || k == p-1) {
           // fake cells
 
-          cell = new CellInitData(CellInitData::CIDT_FAKE);
+          if (((i == start[sep::X] || i == n-1) && !without_fakes[sep::X]) ||
+              ((j == start[sep::Y] || j == m-1) && !without_fakes[sep::Y]) ||
+              ((k == start[sep::Z] || k == p-1) && !without_fakes[sep::Z])) {
+            // only for some edges
+
+            cell = new CellInitData(CellInitData::CIDT_FAKE);
+          }
         }
         else {
           // normal cells
@@ -164,11 +171,11 @@ void GridMaker::AddBox(vector<int> start, vector<int> size) {
             // cells with temperature
 
             if (i == start[sep::X]+1 || i == n-2)
-              cell->T_start[sep::X] = 0.8;
+              cell->T_start[sep::X] = T_start;
             if (j == start[sep::Y]+1 || j == m-2)
-              cell->T_start[sep::Y] = 1.2;
+              cell->T_start[sep::Y] = T_start;
             if (k == start[sep::Z]+1 || k == p-2)
-              cell->T_start[sep::Z] = 0.7;
+              cell->T_start[sep::Z] = T_start;
           }
         }
 
@@ -185,11 +192,72 @@ void GridMaker::AddBox(vector<int> start, vector<int> size) {
 void GridMaker::BuildOurMainGrid() {
 
   int n, m, p;
-  n = 6;
-  m = 8;
-  p = 5;
+  n = 35;
+  m = 25;
+  p = 10;
+
+  int D = 10;
+  int l = m - 2*D;
+  int d = 4;
+  int h = 3;
 
   FillInGridWithNulls(n, m, p);
 
+  vector<int> start = vector<int>(3);
+  vector<int> size = vector<int>(3);
+  vector<bool> without_fakes = vector<bool>(3);
 
+  // Add first box
+
+  without_fakes[sep::X] = false;
+  without_fakes[sep::Y] = false;
+  without_fakes[sep::Z] = false;
+
+  start[sep::X] = 0;
+  start[sep::Y] = D + l;
+  start[sep::Z] = 0;
+
+  size[sep::X] = n;
+  size[sep::Y] = D;
+  size[sep::Z] = D;
+
+  AddBox(start, size, 1.0, without_fakes);
+
+  // Add second box
+
+  without_fakes[sep::X] = false;
+  without_fakes[sep::Y] = false;
+  without_fakes[sep::Z] = false;
+
+  start[sep::X] = 0;
+  start[sep::Y] = 0;
+  start[sep::Z] = 0;
+
+  size[sep::X] = n;
+  size[sep::Y] = D;
+  size[sep::Z] = D;
+
+  AddBox(start, size, 0.8, without_fakes);
+
+  // Add gaps boxes
+
+  without_fakes[sep::X] = false;
+  without_fakes[sep::Y] = true;
+  without_fakes[sep::Z] = false;
+
+  int gaps_q = 3;
+  int x_space = (n - ((gaps_q - 1)*(d + h) + d))/2;
+
+  for (int i=0; i<gaps_q; i++) {
+
+    start[sep::X] = x_space + (d + h) * i;
+    start[sep::Y] = D - 2;  // -2 because of fake cells
+    start[sep::Z] = D/2 - d/2;
+
+    size[sep::X] = d + 2; // +2 because of fake cells
+    size[sep::Y] = l + 4; // +4 because of fake cells
+    size[sep::Z] = d + 2; // +2 because of fake cells
+
+    AddBox(start, size, 0.9, without_fakes);
+  }
 }
