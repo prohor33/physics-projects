@@ -22,6 +22,11 @@ Some demo result:
 
 ![image](https://dl.dropboxusercontent.com/u/59969938/Images/snap.png)
 
+One iteration with our small grid:
+![image](https://dl.dropboxusercontent.com/u/59969938/Images/plot.png)
+
+What shall we do next?
+
 2. Add colision integral
 3. Add ability of using symmerty
 4. Parallel our solver with MPI
