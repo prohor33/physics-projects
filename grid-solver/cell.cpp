@@ -163,12 +163,18 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
     return;
   }
 
-  if (!neighbor_[axis].next->neighbor_[axis].next) {
+  if (!neighbor_[axis].next->neighbor_[axis].next ||
+      (neighbor_[axis].next->type() == FAKE &&
+       neighbor_[axis].next->neighbor_[axis].next->type() == FAKE)) {
+
     ComputeHalfSpeedNextIsBorder(axis, dt);
     return;
   }
 
-  if (!neighbor_[axis].prev->neighbor_[axis].prev) {
+  if (!neighbor_[axis].prev->neighbor_[axis].prev ||
+      (neighbor_[axis].prev->type() == FAKE &&
+       neighbor_[axis].prev->neighbor_[axis].prev->type() == FAKE)) {
+
     ComputeHalfSpeedPrevIsBorder(axis, dt);
     return;
   }
@@ -197,8 +203,8 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
       (*cii) = neighbor_[axis].next->speed(coord) -
         (1.0f - fabs(gamma)) / 2.0f *
         neighbor_[axis].next->Limiter(axis, coord);
-	  }
-	}
+    }
+  }
 }
 
 

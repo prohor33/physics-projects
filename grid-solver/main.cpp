@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 
   cout << "initialization complete" << endl;
 
-  SOLVER->Compute();
+  //SOLVER->Compute();
 
   OUT_RESULT->ProcessParameters(sep::FIRST);
   OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
