@@ -1,8 +1,8 @@
 #include "grid.h"
 #include "cell.h"
 #include "parameters.h"
-#include "grid_file_reader.h"
 #include "solver.h"
+#include "grid_file_reader.h"
 
 
 Grid::Grid() {
@@ -16,56 +16,62 @@ Grid::Grid() {
 
 
 Grid::Grid(
-    std::string file_name,
-    std::vector<int> grid_start,
+    std::vector<int> start,
     std::vector<int> size
     ) {
 
   // initialize cells for first gas
-  InitGasCells(sep::FIRST, file_name, grid_start, size);
+  InitGasCells(sep::FIRST, start, size);
 
   if (PARAMETERS->GetSecondGasIsActive()) {
     // initialize cells for second gas
-    InitGasCells(sep::SECOND, file_name, grid_start, size);
+    InitGasCells(sep::SECOND, start, size);
   }
 }
 
 
 void Grid::InitGasCells(
     sep::GasNumb gas_numb,
-    std::string file_name,
-    std::vector<int> grid_start,
+    std::vector<int> start,
     std::vector<int> size
     ) {
 
   // TODO: we should initialize only grid for that process
 
-  GRID_FILE_READER->ReadFile(file_name);
-
   vector<vector<vector<Cell*> > >& cells = cells_[gas_numb];
-
-  int n, m, p;
-
-  n = GRID_FILE_READER->grid_config()->size[sep::X];
-  m = GRID_FILE_READER->grid_config()->size[sep::Y];
-  p = GRID_FILE_READER->grid_config()->size[sep::Z];
-
-  SOLVER->SetWholeCellsQuantity(n * m * p);
 
   Cell* cell;
 
-  p = PARAMETERS->GetUseZAxis() ? p : 1;
+  for (sep::Axis ax=sep::X; ax<=sep::Z; ax = (sep::Axis)((int)ax + 1)) {
+
+    if (SOLVER->GetGridNeighbors()[ax].prev != -1) {
+      start[ax] -= 2;
+      size[ax] += 2;
+    }
+
+    if (SOLVER->GetGridNeighbors()[ax].next != -1)
+      size[ax] += 2;
+  }
+
+  int n, m, p;
+
+  n = start[sep::X] + size[sep::X];
+  m = start[sep::Y] + size[sep::Y];
+  p = start[sep::Z] + size[sep::Z];
 
   // initialize cells for our gas
-  for (int i=0; i<n;i++) {
+  for (int i=start[sep::X]; i<n;i++) {
 
     vector<vector<Cell*> > cells_yz;
 
-    for (int j=0; j<m; j++) {
+    for (int j=start[sep::Y]; j<m; j++) {
 
       vector<Cell*> cells_z;
 
-      for (int k=0; k<p; k++) {
+      for (int k=start[sep::Z]; k<p; k++) {
+
+        // Detect obtained cells
+        
 
         switch (GRID_FILE_READER->cells()[i][j][k]->type) {
         case CellInitData::CIDT_NONE:

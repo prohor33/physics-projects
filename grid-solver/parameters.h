@@ -37,6 +37,12 @@ class Parameters {
     return process_id_;
   }
 
+  void SetProcessesQ(int p_q) { processes_q_ = p_q; }
+
+  int GetProcessesQ() {
+    return processes_q_;
+  }
+
   bool GetSecondGasIsActive() { return second_gas_is_active_; };
 
   void SetSecondGasIsActive(bool x) { second_gas_is_active_ = x; };
@@ -57,6 +63,9 @@ class Parameters {
     return use_z_axis_;
   }
 
+  // we do not need call this in main
+  // because it's invoes in manager.cpp
+  // automatically
   void SetUseParallelComputing(bool x) {
     use_parallel_computing_ = x;
   }
@@ -83,6 +92,7 @@ class Parameters {
   sep::Limiter limiter_;
 
   int process_id_; // for MPI
+  int processes_q_; // too
 
   bool second_gas_is_active_; // second gas flag
 

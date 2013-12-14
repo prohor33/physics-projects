@@ -12,7 +12,7 @@ class Grid {
   Grid();
 
   // for initialization grid from file
-  Grid(std::string, std::vector<int> grid_start, std::vector<int> size);
+  Grid(std::vector<int> start, std::vector<int> size);
 
   ~Grid() {};
 
@@ -30,8 +30,7 @@ class Grid {
 
   void InitGasCells(
       sep::GasNumb gas_number,
-      std::string,
-      std::vector<int> grid_start,
+      std::vector<int> start,
       std::vector<int> size
       );
 

@@ -41,9 +41,10 @@ cb = fig.colorbar(p, ax=ax)
 #ax = plt.axis([0, size_x-1, 0, size_y-1])
 
 plt.title("Temperature")
-plt.show()
 
 #plt.savefig("plot.png")
+
+plt.show()
 
 plt.close()
 

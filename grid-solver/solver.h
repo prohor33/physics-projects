@@ -59,6 +59,8 @@ class Solver {
     neighbors_.push_back(z);
   }
 
+  vector<GridNeighbor> GetGridNeighbors() { return neighbors_; };
+
   void SetWholeCellsQuantity(int x) {
     whole_quantity_of_cells_ = x;
   }
