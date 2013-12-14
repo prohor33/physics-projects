@@ -37,5 +37,6 @@ What shall we do next?
 
 Grid Maker
 ----------------
-1) Making sample cube grid.
-2) Making our small grid.
+
+1. Making sample cube grid.
+2. Making our small grid.
