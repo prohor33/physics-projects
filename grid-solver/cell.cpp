@@ -20,7 +20,8 @@ CellNeighbor::CellNeighbor(
 
 Cell::Cell(sep::GasNumb gas_numb, CellType type) :
     gas_numb_(gas_numb),
-    type_(type)
+    type_(type),
+    obtained_(false)
   {
 
   wall_t_ = vector<double>(3);
@@ -159,7 +160,7 @@ int Cell::GetIndex(vector<int> coord) {
 
 void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
-  if (type_ != NORMAL) {
+  if (type_ != NORMAL || obtained_) {
     return;
   }
 
@@ -210,7 +211,7 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
 void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
-  if (type_ != NORMAL) {
+  if (type_ != NORMAL || obtained_) {
     return;
   }
 

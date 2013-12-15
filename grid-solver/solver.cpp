@@ -67,7 +67,16 @@ void Solver::MakeStep(sep::Axis axis, double dt) {
 
 void Solver::ExchangeEdgeZoneHalfSpeed() {
   // TODO: to implement
-  //cout << "ExchangeEdgeZoneHalfSpeed" << endl;
+
+  if (!PARAMETERS->GetUseParallelComputing())
+    return;
+
+  for (sep::Axis ax=sep::X; ax<=sep::Z; ax = (sep::Axis)((int)ax + 1)) {
+
+    if (SOLVER->GetGridNeighbors()[ax].prev != -1) {
+      // should develop and test exchange algorithm
+    }
+  }
 }
 
 

@@ -147,6 +147,12 @@ void GridMaker::AddBox(vector<int> start, vector<int> size,
 
         CellInitData* &cell = cells_[i][j][k];
 
+        // one rule: (do we need this?)
+        // if cell is already exist and it's type is normal
+        // we do not overwrite it
+        if (cell->type == CellInitData::CIDT_NORMAL)
+          continue;
+
         if (i == start[sep::X] || i == n-1 ||
             j == start[sep::Y] || j == m-1 ||
             k == start[sep::Z] || k == p-1) {

@@ -29,7 +29,6 @@ class Cell {
     NONE = 0,
     NORMAL = 1,
     FAKE = 2,
-    OBTAINED = 3
   };
 
   Cell(sep::GasNumb gas_numb, CellType type=NORMAL);
@@ -90,6 +89,8 @@ class Cell {
 
   vector<int> space_coord() { return space_coord_; };
 
+  bool&  obtained() { return obtained_; };
+
  private:
 
   vector<double> speed_;
@@ -102,6 +103,8 @@ class Cell {
   vector<int> space_coord_;
 
   vector<double> wall_t_; // for different axes
+
+  bool  obtained_;
 };
 
 #endif // _CELL_H_

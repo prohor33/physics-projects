@@ -70,9 +70,6 @@ void Grid::InitGasCells(
 
       for (int k=start[sep::Z]; k<p; k++) {
 
-        // Detect obtained cells
-        
-
         switch (GRID_FILE_READER->cells()[i][j][k]->type) {
         case CellInitData::CIDT_NONE:
 
@@ -111,10 +108,23 @@ void Grid::InitGasCells(
           return;
           break;
         }
+
+        // Detect obtained cells
+        if (i < 2 && SOLVER->GetGridNeighbors()[sep::X].prev != -1)
+          cell->obtained() = true;
+        if (i >= n-2 && SOLVER->GetGridNeighbors()[sep::X].next != -1)
+          cell->obtained() = true;
+        if (j < 2 && SOLVER->GetGridNeighbors()[sep::Y].prev != -1)
+          cell->obtained() = true;
+        if (j >= m-2 && SOLVER->GetGridNeighbors()[sep::Y].next != -1)
+          cell->obtained() = true;
+        if (k < 2 && SOLVER->GetGridNeighbors()[sep::Z].prev != -1)
+          cell->obtained() = true;
+        if (k >= p-2 && SOLVER->GetGridNeighbors()[sep::Z].next != -1)
+          cell->obtained() = true;
       }
 
       cells_yz.push_back(cells_z);
-
     }
 
     cells.push_back(cells_yz);
