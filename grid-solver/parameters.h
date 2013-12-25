@@ -16,11 +16,24 @@ class Parameters {
     return &parameters_;
   }
 
+  void Initialize();
+
   void SetMolMass(
       double mol_mass_gas1,
       double mol_mass_gas2) {
     mol_mass_gas1_ = mol_mass_gas1;
     mol_mass_gas2_ = mol_mass_gas2;
+  }
+
+  double GetMolMass(int gas_numb) {
+    switch(gas_numb) {
+      case 0:
+        return mol_mass_gas1_;
+      case 1:
+        return mol_mass_gas2_;
+      default:
+        return -1;
+    }
   }
 
   void SetTimeStep(double time_step) {
@@ -80,6 +93,27 @@ class Parameters {
     return use_grid_from_input_file_;
   }
 
+  void SetUseCollisionIntegral(bool x) {
+    use_collision_integral_ = x;
+  }
+  bool GetUseCollisionIntegral() {
+    return use_collision_integral_;
+  }
+
+  void SetSpeedQuantity(int x) {
+    speed_quantity_ = x;
+  }
+  int GetSpeedQuantity() {
+    return speed_quantity_;
+  }
+
+  void SetPCut(double x) {
+    p_cut_ = x;
+  }
+  double GetPCut() {
+    return p_cut_;
+  }
+
  protected:
 
   Parameters();
@@ -106,6 +140,12 @@ class Parameters {
   bool use_parallel_computing_;
 
   bool use_grid_from_input_file_;
+
+  bool use_collision_integral_;
+
+  int speed_quantity_;
+
+  double p_cut_;
 };
 
 #define PARAMETERS Parameters::Instance()

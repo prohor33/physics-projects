@@ -8,9 +8,11 @@ cmake_minimum_required(VERSION 2.6)
 
   SET(SOURCES
           main.cpp
+          ci.cpp
           cell.cpp
           grid_file_reader.cpp
           grid.cpp
+          integral.cpp
           manager.cpp
           out_result.cpp
           parameters.cpp
@@ -20,6 +22,8 @@ cmake_minimum_required(VERSION 2.6)
   ADD_EXECUTABLE(grid-solver ${SOURCES})
 
   TARGET_LINK_LIBRARIES(grid-solver ${MPI_LIBRARIES})
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse2 -msse3")
 
   if(MPI_COMPILE_FLAGS)
     set_target_properties(grid-solver PROPERTIES

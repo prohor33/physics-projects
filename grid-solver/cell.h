@@ -46,6 +46,8 @@ class Cell {
   void ComputeHalfSpeedNextIsBorder(sep::Axis axis,
       double dt);
 
+  vector<double>& speed() { return speed_; };
+
   inline double& speed(vector<int> coord) {
     return speed_[GetIndex(coord)];
   }

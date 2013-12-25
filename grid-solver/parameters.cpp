@@ -1,25 +1,27 @@
 #include "parameters.h"
 
-Parameters::Parameters() {
+Parameters::Parameters() {}
 
-  double speed_cut = 4.8f;
+void Parameters::Initialize() {
+
+  // TODO: Should be here impulses, not velocities?
 
   // fill in velocities
-  int speed_quantity = 16; // for debug (should be 20)
-  for (int i=0; i<speed_quantity; i++) {
-    velocity_.push_back(-speed_cut + i * speed_cut * 2.0f / (speed_quantity-1));
+  for (int i=0; i<speed_quantity_; i++) {
+    velocity_.push_back(-p_cut_ +
+        i * p_cut_ * 2.0f / (speed_quantity_-1));
   }
 
   // fill in velocities maps
   int index = 0;
   vector<int> coord(3);
-  for (int i=0; i<speed_quantity; i++) {
-    for (int j=0; j<speed_quantity; j++) {
-      for (int k=0; k<speed_quantity; k++) {
+  for (int i=0; i<speed_quantity_; i++) {
+    for (int j=0; j<speed_quantity_; j++) {
+      for (int k=0; k<speed_quantity_; k++) {
 
         // check for the out of cut sphere case
         if (sep::sqr(velocity_[i]) + sep::sqr(velocity_[j]) +
-            sep::sqr(velocity_[k]) < sep::sqr(speed_cut)) {
+            sep::sqr(velocity_[k]) < sep::sqr(p_cut_)) {
           // inside
 
           coord[0] = i;

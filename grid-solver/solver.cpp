@@ -1,6 +1,7 @@
 #include "solver.h"
 #include "out_result.h"
 #include "parameters.h"
+#include "integral.h"
 
 string sep::int_to_string(int i) {
 
@@ -19,10 +20,17 @@ void Solver::Compute() {
 
   MeasureTime();
 
-  int iterations = 1;
+  int iterations = 10;
 
   for (int i=0; i<iterations; i++) {
+
     ComputeIteration(1.0); // like_a_tau = 1.0, because of time_step = 0.02smth
+
+    cout << "Outputting results..." << endl;
+
+    OUT_RESULT->ProcessParameters(sep::FIRST);
+    OUT_RESULT->OutParameters(sep::FIRST);
+
     cout << "Iteration " << i << " done." << endl;
   }
 
@@ -45,10 +53,15 @@ void Solver::ComputeIteration(double dt) {
   if (PARAMETERS->GetUseZAxis())
     MakeStep(sep::Z, dt);
 
+  if (PARAMETERS->GetUseCollisionIntegral())
+    INTEGRAL->Iteration();
 }
 
 
 void Solver::MakeStep(sep::Axis axis, double dt) {
+
+  // and exchange obtained data in edge zone between grids
+  ExchangeEdgeZoneSpeed();
 
   // just let all grids compute their half speed
   // since they all have necessary data for doing it
@@ -58,10 +71,6 @@ void Solver::MakeStep(sep::Axis axis, double dt) {
   ExchangeEdgeZoneHalfSpeed();
 
   grid_->ComputeSpeed(axis, dt);
-
-  // and exchange obtained data in edge zone between grids
-  ExchangeEdgeZoneSpeed();
-
 }
 
 

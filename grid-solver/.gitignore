@@ -6,3 +6,8 @@ grid-solver
 # result files
 
 *.result
+
+
+# result directory
+
+test_results/*
