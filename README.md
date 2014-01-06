@@ -25,6 +25,9 @@ Some demo result:
 One iteration with our small grid:
 ![image](https://dl.dropboxusercontent.com/u/59969938/Images/plot.png)
 
+Five iterations with our small grid:
+![image](https://dl.dropboxusercontent.com/u/59969938/Images/plot_5_it.png)
+
 What shall we do next?
 
 2. Add colision integral
