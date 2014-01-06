@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 2.6)
           out_result.cpp
           parameters.cpp
           solver.cpp
+          test.cpp
           )
 
   ADD_EXECUTABLE(grid-solver ${SOURCES})

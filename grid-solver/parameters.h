@@ -114,7 +114,11 @@ class Parameters {
     return p_cut_;
   }
 
- protected:
+  inline double& Gamma(vector<int>& coord) {
+    return gamma_[coord[sep::INDEX]];
+  }
+
+protected:
 
   Parameters();
   ~Parameters() {};
@@ -130,7 +134,9 @@ class Parameters {
 
   bool second_gas_is_active_; // second gas flag
 
-  map<int, vector<int> > s_coord_map_1d_to_3d_;
+  // TODO: that's can't be right
+  //map<int, vector<int> > s_coord_map_1d_to_3d_;
+  vector<vector<int> > s_coord_map_1d_to_3d_;
   map<vector<int>, int> s_coord_map_3d_to_1d_;
 
   bool use_checking_mass_conservation_;
@@ -146,6 +152,8 @@ class Parameters {
   int speed_quantity_;
 
   double p_cut_;
+
+  vector<double> gamma_;
 };
 
 #define PARAMETERS Parameters::Instance()

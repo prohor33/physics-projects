@@ -48,11 +48,11 @@ class Cell {
 
   vector<double>& speed() { return speed_; };
 
-  inline double& speed(vector<int> coord) {
-    return speed_[GetIndex(coord)];
+  inline double& speed(vector<int>& coord) {
+    return speed_[coord[sep::INDEX]];
   }
   inline double& speed_half(vector<int> coord) {
-    return speed_half_[GetIndex(coord)];
+    return speed_half_[coord[sep::INDEX]];
   }
 
   double MolMass() const;
@@ -64,12 +64,10 @@ class Cell {
 
   inline double P2(vector<int> coord) const;
 
-  inline double Limiter(sep::Axis axis,
-      vector<int> coord);
+  inline double Limiter(sep::Axis& axis,
+      vector<int>& coord);
 
-  vector<int> GetSpeedCoord(int index);
-
-  int GetIndex(vector<int> coord);
+  vector<int>& GetSpeedCoord(int index);
 
   CellType type() { return type_; };
 

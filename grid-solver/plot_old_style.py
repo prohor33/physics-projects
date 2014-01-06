@@ -12,6 +12,8 @@ data = np.loadtxt("test_T_gas" + str(gas_index) + ".result")
 
 size_x = 35
 size_y = 25
+#size_x = 6
+#size_y = 8
 
 X = data[:,0].reshape(size_x, size_y)
 Y = data[:,1].reshape(size_x, size_y)

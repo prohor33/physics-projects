@@ -27,6 +27,8 @@ void Manager::Initialize(int argc, char *argv[]) {
   PARAMETERS->SetProcessID(rank);
 
   InitializeSolver();
+
+  cout << "Initialization complete" << endl;
 }
 
 void Manager::InitializeSolver() {

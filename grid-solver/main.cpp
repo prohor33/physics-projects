@@ -21,15 +21,13 @@ int main(int argc, char *argv[]) {
 
   PARAMETERS->SetGridFromInputFile(true);
 
-  PARAMETERS->SetUseCollisionIntegral(true);
+  PARAMETERS->SetUseCollisionIntegral(false);
 
   OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
 
   PARAMETERS->Initialize(); // should be first initialization
 
   MANAGER->Initialize(argc, argv);
-
-  cout << "initialization complete" << endl;
 
   SOLVER->Compute();
 

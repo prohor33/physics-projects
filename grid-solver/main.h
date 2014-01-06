@@ -15,6 +15,10 @@ using namespace std;
 
 namespace sep { // my separator namespace
 
+  enum {
+    INDEX = 3
+  };
+
   enum Axis {
     X = 0,
     Y = 1,

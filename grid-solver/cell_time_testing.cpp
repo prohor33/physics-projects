@@ -1,5 +1,8 @@
 #include "cell.h"
 #include "parameters.h"
+#include "test.h"
+
+#include <stdlib.h> // for exit()
 
 CellNeighbor::CellNeighbor(
     Cell* next_c,
@@ -95,16 +98,24 @@ double Cell::P2(vector<int> coord) const {
 inline double Cell::Limiter(sep::Axis& axis,
     vector<int>& coord) {
 
+  //double a;
+
+  //double val = speed(coord);
+  //double next = neighbor_[axis].next->speed(coord);
+  //double prev = neighbor_[axis].prev->speed(coord);
+
+//    return sep::min(
+//        sep::min(sep::module(10.0 - 9.0) / 2.0f,
+//        2.0f * sep::module(10.0 - 9.0)),
+//        2.0f * sep::module(10.0 - 9.0)) *
+//        sep::sign(2.0 - 1.0);
+
+  double val, next, prev;
+
   if( !neighbor_[axis].next || !neighbor_[axis].prev ) {
     cout << "error limiter" << endl;
     return -1.0f;
   }
-
-  double a;
-
-  double val = speed(coord);
-  double next = neighbor_[axis].next->speed(coord);
-  double prev = neighbor_[axis].prev->speed(coord);
 
   switch (PARAMETERS->limiter_) {
   case sep::SUPERBEE:
@@ -151,6 +162,12 @@ inline vector<int>& Cell::GetSpeedCoord(int index) {
   return PARAMETERS->s_coord_map_1d_to_3d_[index];
 }
 
+// This is really bad function
+//int Cell::GetIndex(vector<int>& coord) {
+//
+//  return PARAMETERS->s_coord_map_3d_to_1d_[coord];
+//}
+
 
 void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
@@ -179,13 +196,38 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
   vector<int> coord(4);
   vector<double>::iterator cii;
-  double gamma_without_p = dt / MolMass() * PARAMETERS->time_step_ / H();
+
+  // Test result for 29 December 2013
+  // Taken time for GetSpeedCoord(): 0 m 8.26 s.
+  // Taken time for Computing p and gamma: 0 m 3.36 s.
+  // Taken time for Computing new speed: fabs(), Limiter(): 3 m 0.781998 s.
+  // Taken time for Limiter(): 2 m 42.512 s.
+  // Taken time for fabs(): 0 m 0.406 s.
+
+  NotchTheTime("GetSpeedCoord()");
 
   for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
     coord = GetSpeedCoord((int)(cii-speed_half_.begin()));
+  }
+
+  NotchTheTime();
+
+  NotchTheTime("Computing p and gamma");
+
+  double gamma_without_p = dt / MolMass() * PARAMETERS->time_step_ / H();
+
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
+
     p = P(axis, coord);
     gamma = p * gamma_without_p;
+  }
+
+  NotchTheTime();
+
+  NotchTheTime("Computing new speed: fabs(), Limiter() and other operations");
+
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
 
     if (p > 0.0f) {
       // for speed > 0
@@ -201,6 +243,40 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
         neighbor_[axis].next->Limiter(axis, coord);
     }
   }
+
+  NotchTheTime();
+
+  NotchTheTime("Limiter()");
+
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
+
+    Limiter(axis, coord);
+  }
+
+  NotchTheTime();
+
+  NotchTheTime("fabs()");
+
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
+
+    fabs(gamma);
+  }
+
+  NotchTheTime();
+
+  NotchTheTime("2+3");
+
+  for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
+
+    sep::sign(0);
+    sep::module(0);
+    sep::min(0, 1);
+  }
+
+  NotchTheTime();
+
+
+  exit(0);
 }
 
 
@@ -215,7 +291,6 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
   vector<int> coord(4);
   vector<double>::iterator cii;
-  double gamma_without_p = dt / MolMass() * PARAMETERS->time_step_ / H();
 
   for (cii=speed_.begin(); cii!=speed_.end(); ++cii) {
 
@@ -223,7 +298,7 @@ void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
     p = P(axis, coord);
 
-    gamma = p * gamma_without_p;
+    gamma = dt * p / MolMass() * PARAMETERS->time_step_ / H();
 
     speed(coord) +=
         - gamma * (speed_half(coord) - neighbor_[axis].prev->speed_half(coord));
@@ -239,7 +314,7 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
   double gamma;
   double p, p2;
 
-  vector<int> coord(4);
+  vector<int> coord(3);
   vector<double>::iterator cii;
 
   for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {
@@ -307,7 +382,13 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
 
       neighbor_[axis].prev->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));
-
+//      cout << "2.0f * g - speed(coord) = " << 2.0f * g - speed(coord) << endl;
+//      cout << "2.0f * MolMass() * wall_t_ = " << 2.0f * MolMass() * wall_t_ << endl;
+//      cout << "sep::sqr(p) = " << sep::sqr(p) << endl;
+//      cout << "pow = " << (-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_) << endl;
+//      cout << "exp = " << exp((-1.0f) * sep::sqr(p) / (2.0f * MolMass() * wall_t_)) << endl;
+//      cout << "g = " << g << endl;
+//      cout << "speed(coord) = " << speed(coord) << endl;
       speed_half(coord) = speed(coord) +
         (1.0f - fabs(gamma)) / 2.0f * Limiter(axis, coord);
 
@@ -330,7 +411,7 @@ void Cell::ComputeHalfSpeedNextIsBorder(sep::Axis axis, double dt) {
   double gamma;
   double p, p2;
 
-  vector<int> coord(4);
+  vector<int> coord(3);
   vector<double>::iterator cii;
 
   for (cii=speed_half_.begin(); cii!=speed_half_.end(); ++cii) {

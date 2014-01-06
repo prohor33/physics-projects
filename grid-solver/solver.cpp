@@ -20,19 +20,20 @@ void Solver::Compute() {
 
   MeasureTime();
 
-  int iterations = 10;
+  int iterations = 5;
 
   for (int i=0; i<iterations; i++) {
 
     ComputeIteration(1.0); // like_a_tau = 1.0, because of time_step = 0.02smth
 
-    cout << "Outputting results..." << endl;
-
-    OUT_RESULT->ProcessParameters(sep::FIRST);
-    OUT_RESULT->OutParameters(sep::FIRST);
-
     cout << "Iteration " << i << " done." << endl;
   }
+
+  OUT_RESULT->ProcessParameters(sep::FIRST);
+  // TODO: this add new results to old one
+  OUT_RESULT->OutParameters(sep::FIRST);
+
+  cout << "Outputting results done." << endl;
 
   MeasureTime(iterations);
 
@@ -111,10 +112,9 @@ void Solver::MeasureTime(int iterations) {
     cout << "Taken time: " << (int)(time/60.0) << " m " <<
       ((int)time)%60 << " s." << endl;
 
-    time /= whole_quantity_of_cells_; // second per cell
-    time *= 1000.0 / iterations;  // 1000 iterations per cell
+    time /= iterations;
 
-    cout << "Time for 1 cell x1000 iteration: " << (int)(time/60.0) << " m " <<
+    cout << "Average time for one iteration: " << (int)(time/60.0) << " m " <<
       ((int)time)%60 << " s." << endl;
   }
 }
