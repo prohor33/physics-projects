@@ -72,23 +72,25 @@ void OutResult::OutParameters(sep::GasNumb gas_numb) {
 // prepare parameters to be printed out
 void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
-  vector<vector<vector<Cell*> > >::iterator cii_x;
-  vector<vector<Cell*> >::iterator cii_xy;
-  vector<Cell*>::iterator cii_xyz;
-
   vector<double>::iterator cii;
 
   vector<int> coord(3);
+  Cell* cell;
+  vector<int>& size = SOLVER->grid()->size();
 
-  for (cii_x=SOLVER->grid_->cells(gas_numb).begin();
-      cii_x!=SOLVER->grid_->cells(gas_numb).end(); ++cii_x) {
-    for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
-      for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
+  for(int i=0; i<size[sep::X]; i++) {
+    for(int j=0; j<size[sep::Y]; j++) {
+      for(int k=0; k<size[sep::Z]; k++) {
 
-        if ((*cii_xyz)->type() != Cell::NORMAL) {
+        cell = SOLVER->grid()->cells()[gas_numb][i][j][k];
 
+        if (cell->type() != Cell::NORMAL) {
+
+          // TODO: make it global coordinate
+          // actually we shoild develop another
+          // way to output results in parallel case
           parameters_[gas_numb].push_back(
-            CellParameters((*cii_xyz)->space_coord(), 0.0, 0.0));
+            CellParameters(cell->space_coord(), 0.0, 0.0));
 
           continue;
         }
@@ -101,41 +103,41 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         double T = 0.0;
 
         // process constants
-        for (cii=(*cii_xyz)->speed_.begin();
-          cii!=(*cii_xyz)->speed_.end(); ++cii) {
+        for (cii=cell->speed_.begin();
+          cii!=cell->speed_.end(); ++cii) {
 
           coord =
-            (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+            cell->GetSpeedCoord((int)(cii-cell->speed_.begin()));
 
-          n += (*cii_xyz)->speed(coord);
+          n += cell->speed(coord);
 
-          u_x += (*cii_xyz)->speed(coord) *
-              (*cii_xyz)->P(sep::X, coord) / (*cii_xyz)->MolMass();
+          u_x += cell->speed(coord) *
+              cell->P(sep::X, coord) / cell->MolMass();
 
-          u_y += (*cii_xyz)->speed(coord) *
-              (*cii_xyz)->P(sep::Y, coord) / (*cii_xyz)->MolMass();
+          u_y += cell->speed(coord) *
+              cell->P(sep::Y, coord) / cell->MolMass();
 
-          u_z += (*cii_xyz)->speed(coord) *
-              (*cii_xyz)->P(sep::Z, coord) / (*cii_xyz)->MolMass();
+          u_z += cell->speed(coord) *
+              cell->P(sep::Z, coord) / cell->MolMass();
         }
 
         // normalize
         u_x /= n; u_y /= n; u_z /= n;
 
-        for (cii=(*cii_xyz)->speed_.begin();
-          cii!=(*cii_xyz)->speed_.end(); ++cii) {
+        for (cii=cell->speed_.begin();
+          cii!=cell->speed_.end(); ++cii) {
 
           coord =
-            (*cii_xyz)->GetSpeedCoord((int)(cii-(*cii_xyz)->speed_.begin()));
+            cell->GetSpeedCoord((int)(cii-cell->speed_.begin()));
 
-          T += (*cii_xyz)->MolMass() *
-              (sep::sqr((*cii_xyz)->P(sep::X, coord) /
-                        (*cii_xyz)->MolMass() - u_x)+
-              sep::sqr((*cii_xyz)->P(sep::Y, coord) /
-                (*cii_xyz)->MolMass() - u_y)+
-              sep::sqr((*cii_xyz)->P(sep::Z, coord) /
-                (*cii_xyz)->MolMass() - u_z)) *
-              (*cii_xyz)->speed(coord);
+          T += cell->MolMass() *
+              (sep::sqr(cell->P(sep::X, coord) /
+                        cell->MolMass() - u_x)+
+              sep::sqr(cell->P(sep::Y, coord) /
+                cell->MolMass() - u_y)+
+              sep::sqr(cell->P(sep::Z, coord) /
+                cell->MolMass() - u_z)) *
+              cell->speed(coord);
         }
 
         T /= n;
@@ -143,7 +145,7 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         T /= 3;
 
         parameters_[gas_numb].push_back(
-            CellParameters((*cii_xyz)->space_coord(), T, n));
+            CellParameters(cell->space_coord(), T, n));
       }
     }
   }
@@ -154,34 +156,34 @@ void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
   if (!PARAMETERS->GetUseCheckingMassConservation())
     return;
 
-  vector<vector<vector<Cell*> > >::iterator cii_x;
-  vector<vector<Cell*> >::iterator cii_xy;
-  vector<Cell*>::iterator cii_xyz;
-
   vector<double>::iterator cii;
 
   vector<int> coord(3);
 
   double whole_mass = 0;
 
-  for (cii_x=SOLVER->grid_->cells(gas_numb).begin();
-      cii_x!=SOLVER->grid_->cells(gas_numb).end(); ++cii_x) {
-    for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
-      for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
+  Cell* cell;
+  vector<int>& size = SOLVER->grid()->size();
 
-        if ((*cii_xyz)->type() != Cell::NORMAL)
+  for(int i=0; i<size[sep::X]; i++) {
+    for(int j=0; j<size[sep::Y]; j++) {
+      for(int k=0; k<size[sep::Z]; k++) {
+
+        cell = SOLVER->grid()->cells()[gas_numb][i][j][k];
+
+        if (cell->type() != Cell::NORMAL)
           continue;
 
         double n = 0.0;
 
         // process constants
-        for (cii=(*cii_xyz)->speed_.begin();
-          cii!=(*cii_xyz)->speed_.end(); ++cii) {
+        for (cii=cell->speed_.begin();
+          cii!=cell->speed_.end(); ++cii) {
 
-          coord = (*cii_xyz)->GetSpeedCoord(
-              (int)(cii-(*cii_xyz)->speed_.begin()));
+          coord = cell->GetSpeedCoord(
+              (int)(cii-cell->speed_.begin()));
 
-          n += (*cii_xyz)->speed(coord);
+          n += cell->speed(coord);
         }
 
         whole_mass += n;

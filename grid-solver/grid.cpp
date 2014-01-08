@@ -7,6 +7,8 @@
 
 Grid::Grid() {
 
+  // this will be not from file grid
+
   // initialize cells for first gas
   InitGasCells(sep::FIRST);
 
@@ -38,7 +40,7 @@ void Grid::InitGasCells(
 
   // TODO: we should initialize only grid for that process
 
-  vector<vector<vector<Cell*> > >& cells = cells_[gas_numb];
+  Cell****& cells = cells_[gas_numb];
 
   Cell* cell;
 
@@ -59,16 +61,27 @@ void Grid::InitGasCells(
   m = start[sep::Y] + size[sep::Y];
   p = start[sep::Z] + size[sep::Z];
 
+  size_ = vector<int>(3);
+  size_[sep::X] = size[sep::X];
+  size_[sep::Y] = size[sep::Y];
+  size_[sep::Z] = size[sep::Z];
+  start_ = vector<int>(3);
+  start_[sep::X] = start[sep::X];
+  start_[sep::Y] = start[sep::Y];
+  start_[sep::Z] = start[sep::Z];
+
+  cells = new Cell***[size[sep::X]];
+
   // initialize cells for our gas
-  for (int i=start[sep::X]; i<n;i++) {
+  for (int i=0; i<size[sep::X];i++) {
 
-    vector<vector<Cell*> > cells_yz;
+    cells[i] = new Cell**[size[sep::Y]];
 
-    for (int j=start[sep::Y]; j<m; j++) {
+    for (int j=0; j<size[sep::Y]; j++) {
 
-      vector<Cell*> cells_z;
+      cells[i][j] = new Cell*[size[sep::Z]];
 
-      for (int k=start[sep::Z]; k<p; k++) {
+      for (int k=0; k<size[sep::Z]; k++) {
 
         switch (GRID_FILE_READER->cells()[i][j][k]->type) {
         case CellInitData::CIDT_NONE:
@@ -77,7 +90,7 @@ void Grid::InitGasCells(
 
           cell->SetSpaceCoord(i, j, k);
 
-          cells_z.push_back(cell);
+          cells[i][j][k] = cell;
           //cout << "Warning: Empty cell is created" << endl;
           break;
 
@@ -100,7 +113,7 @@ void Grid::InitGasCells(
 
           cell->SetSpaceCoord(i, j, k);
 
-          cells_z.push_back(cell);
+          cells[i][j][k] = cell;
           break;
         default:
           cout << "Error: get wrong cell type during reading input file" <<
@@ -123,11 +136,7 @@ void Grid::InitGasCells(
         if (k >= p-2 && SOLVER->GetGridNeighbors()[sep::Z].next != -1)
           cell->obtained() = true;
       }
-
-      cells_yz.push_back(cells_z);
     }
-
-    cells.push_back(cells_yz);
   }
 
   // initialize neighbors for cells
@@ -163,7 +172,9 @@ void Grid::InitGasCells(
 
 void Grid::InitGasCells(sep::GasNumb gas_numb) {
 
-  vector<vector<vector<Cell*> > >& cells = cells_[gas_numb];
+  // this will be not from file grid
+
+  Cell****& cells = cells_[gas_numb];
 
   // for test let's create rectangle grid n x m
   // with only one gas
@@ -171,18 +182,30 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
   n = 6;
   m = 8;
   p = 5;
+
+  size_ = vector<int>(3);
+  start_ = vector<int>(3);
+  size_[sep::X] = n;
+  size_[sep::Y] = m;
+  size_[sep::Z] = p;
+  start_[sep::X] = 0;
+  start_[sep::Y] = 0;
+  start_[sep::Z] = 0;
+
   Cell* cell;
 
   p = PARAMETERS->GetUseZAxis() ? p : 1;
 
+  cells = new Cell***[n];
+
   // initialize cells for our gas
   for (int i=0; i<n;i++) {
 
-    vector<vector<Cell*> > cells_yz;
+    cells[i] = new Cell**[m];
 
     for (int j=0; j<m; j++) {
 
-      vector<Cell*> cells_z;
+      cells[i][j] = new Cell*[p];
 
       for (int k=0; k<p; k++) {
 
@@ -214,14 +237,9 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
 
         cell->SetSpaceCoord(i, j, k);
 
-        cells_z.push_back(cell);
+        cells[i][j][k] = cell;
       }
-
-      cells_yz.push_back(cells_z);
-
     }
-
-    cells.push_back(cells_yz);
   }
 
   // initialize neighbors for cells
@@ -266,14 +284,10 @@ void Grid::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
 void Grid::ComputeHalfSpeed(sep::GasNumb gas_numb, sep::Axis axis, double dt) {
 
-  vector<vector<vector<Cell*> > >::iterator cii_x;
-  vector<vector<Cell*> >::iterator cii_xy;
-  vector<Cell*>::iterator cii_xyz;
-
-  for (cii_x=cells_[gas_numb].begin(); cii_x!=cells_[gas_numb].end(); ++cii_x) {
-    for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
-      for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
-        (*cii_xyz)->ComputeHalfSpeed(axis, dt);
+  for(int i=0; i<size_[sep::X]; i++) {
+    for(int j=0; j<size_[sep::Y]; j++) {
+      for(int k=0; k<size_[sep::Z]; k++) {
+        cells_[gas_numb][i][j][k]->ComputeHalfSpeed(axis, dt);
       }
     }
   }
@@ -291,14 +305,10 @@ void Grid::ComputeSpeed(sep::Axis axis, double dt) {
 
 void Grid::ComputeSpeed(sep::GasNumb gas_numb, sep::Axis axis, double dt) {
 
-  vector<vector<vector<Cell*> > >::iterator cii_x;
-  vector<vector<Cell*> >::iterator cii_xy;
-  vector<Cell*>::iterator cii_xyz;
-
-  for (cii_x=cells_[gas_numb].begin(); cii_x!=cells_[gas_numb].end(); ++cii_x) {
-    for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
-      for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
-        (*cii_xyz)->ComputeSpeed(axis, dt);
+  for(int i=0; i<size_[sep::X]; i++) {
+    for(int j=0; j<size_[sep::Y]; j++) {
+      for(int k=0; k<size_[sep::Z]; k++) {
+        cells_[gas_numb][i][j][k]->ComputeSpeed(axis, dt);
       }
     }
   }

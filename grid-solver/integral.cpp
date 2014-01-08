@@ -41,35 +41,30 @@ Integral::Integral() {
 
 void Integral::Iteration() {
 
-  // Warning! Low quality code! Needed to be rewritten!
-
   std::cout << "counting integral..." << std::endl;
 
   double m1 = PARAMETERS->GetMolMass(sep::FIRST);
   double m2 = PARAMETERS->GetMolMass(sep::SECOND);
 
-  vector<vector<vector<Cell*> > >::iterator cii_x;
-  vector<vector<Cell*> >::iterator cii_xy;
-  vector<Cell*>::iterator cii_xyz;
+  Cell *cell1, *cell2;
+  vector<int>& size = SOLVER->grid()->size();
 
   // 1<->1
   {
     Generate(PARAMETERS->time_step(), m1, m1, particle, particle);
 
-    // TODO: need to develop some new way to surf throw cells!
+    for(int i=0; i<size[sep::X]; i++) {
+      for(int j=0; j<size[sep::Y]; j++) {
+        for(int k=0; k<size[sep::Z]; k++) {
 
-    for (cii_x=SOLVER->grid()->cells(sep::FIRST).begin();
-        cii_x!=SOLVER->grid()->cells(sep::FIRST).end(); ++cii_x) {
+          cell1 = SOLVER->grid()->cells()[0][i][j][k];
 
-      for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
-        for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
-
-          if ((*cii_xyz)->type() != Cell::NORMAL)
+          if (cell1->type() != Cell::NORMAL)
             continue;
 
-          FillInput(*cii_xyz, NULL);
+          FillInput(cell1, NULL);
           ci::iter(input_for_ci1, input_for_ci1);
-          GetInput(*cii_xyz, NULL);
+          GetInput(cell1, NULL);
         }
       }
     }
@@ -82,43 +77,40 @@ void Integral::Iteration() {
   {
     Generate(2.0 * PARAMETERS->time_step(), m1, m2, particle, particle);
 
-    for (cii_x=SOLVER->grid()->cells(sep::FIRST).begin();
-        cii_x!=SOLVER->grid()->cells(sep::FIRST).end(); ++cii_x) {
+    for(int i=0; i<size[sep::X]; i++) {
+      for(int j=0; j<size[sep::Y]; j++) {
+        for(int k=0; k<size[sep::Z]; k++) {
 
-      for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
-        for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
+          cell1 = SOLVER->grid()->cells()[0][i][j][k];
+          cell2 = SOLVER->grid()->cells()[1][i][j][k];
 
-          if ((*cii_xyz)->type() != Cell::NORMAL)
+          if (cell1->type() != Cell::NORMAL)
             continue;
 
-          int x = cii_xyz - (*cii_xy).begin();
-          int y = cii_xy - (*cii_x).begin();
-          int z = cii_x - SOLVER->grid()->cells(sep::FIRST).begin();
-          Cell* cell2 = SOLVER->grid()->cells(sep::SECOND)[x][y][z];
-
-          FillInput(*cii_xyz, cell2);
+          FillInput(cell1, cell2);
           ci::iter(input_for_ci1, input_for_ci2);
-          FillInput(*cii_xyz, cell2);
+          FillInput(cell1, cell2);
         }
       }
     }
   }
+
   // 2<->2
   {
     Generate(PARAMETERS->time_step(), m2, m2, particle, particle);
 
-    for (cii_x=SOLVER->grid()->cells(sep::SECOND).begin();
-        cii_x!=SOLVER->grid()->cells(sep::SECOND).end(); ++cii_x) {
+    for(int i=0; i<size[sep::X]; i++) {
+      for(int j=0; j<size[sep::Y]; j++) {
+        for(int k=0; k<size[sep::Z]; k++) {
 
-      for (cii_xy=(*cii_x).begin(); cii_xy!=(*cii_x).end(); ++cii_xy) {
-        for (cii_xyz=(*cii_xy).begin(); cii_xyz!=(*cii_xy).end(); ++cii_xyz) {
+          cell2 = SOLVER->grid()->cells()[1][i][j][k];
 
-          if ((*cii_xyz)->type() != Cell::NORMAL)
+          if (cell2->type() != Cell::NORMAL)
             continue;
 
-          FillInput(NULL, *cii_xyz);
+          FillInput(NULL, cell2);
           ci::iter(input_for_ci2, input_for_ci2);
-          GetInput(NULL, *cii_xyz);
+          GetInput(NULL, cell2);
         }
       }
     }

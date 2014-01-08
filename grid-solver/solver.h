@@ -65,7 +65,11 @@ class Solver {
     whole_quantity_of_cells_ = x;
   }
 
- void MeasureTime(int iterations=0);
+  void MeasureTime(int iterations=0);
+
+  void SendEdgeCells(sep::Axis axis, bool is_right, int dest);
+
+  void RecieveObtainedCells(sep::Axis axis, bool is_right, int src);
 
  private:
 

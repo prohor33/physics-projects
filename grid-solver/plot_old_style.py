@@ -44,7 +44,7 @@ cb = fig.colorbar(p, ax=ax)
 
 plt.title("Temperature")
 
-plt.savefig("plot.png")
+#plt.savefig("plot.png")
 
 plt.show()
 

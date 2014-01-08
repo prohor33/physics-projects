@@ -22,8 +22,16 @@ class Grid {
   void ComputeSpeed(sep::Axis axis, double dt);
   void ComputeSpeed(sep::GasNumb gas_numb, sep::Axis axis, double dt);
 
-  vector<vector<vector<Cell*> > >& cells(sep::GasNumb gas_number) {
+  Cell***** cells() {
+    return cells_;
+  }
+
+  Cell**** cells(sep::GasNumb gas_number) {
     return cells_[gas_number];
+  }
+
+  vector<int>& size() {
+    return size_;
   }
 
  private:
@@ -36,7 +44,10 @@ class Grid {
 
   void InitGasCells(sep::GasNumb gas_number);
 
-  vector<vector<vector<Cell*> > > cells_[2];   // two gases
+  Cell**** cells_[2];  // two gases
+
+  vector<int> size_;
+  vector<int> start_;
 };
 
 #endif  // _GRID_H_

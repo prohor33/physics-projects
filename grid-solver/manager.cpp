@@ -46,12 +46,6 @@ void Manager::InitializeSolver() {
     return;
   }
 
-  // Here we should initialize only
-  // grid for this process, it's depends on process_id
-
-  int rank = PARAMETERS->GetProcessID();
-  int size = PARAMETERS->GetProcessesQ();
-
   GRID_FILE_READER->ReadFile("our_small.grid");
 
   int n, m, p;
@@ -89,6 +83,13 @@ void Manager::InitializeSolver() {
   }
 
   // Parallel computing case
+
+  // Here we should initialize only
+  // grid for this process, it's depends on process_id
+
+  int rank = PARAMETERS->GetProcessID();
+  int size = PARAMETERS->GetProcessesQ();
+
 
   if (rank == size-1) {
     // last process

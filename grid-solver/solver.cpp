@@ -20,7 +20,7 @@ void Solver::Compute() {
 
   MeasureTime();
 
-  int iterations = 5;
+  int iterations = 1;
 
   for (int i=0; i<iterations; i++) {
 
@@ -81,12 +81,48 @@ void Solver::ExchangeEdgeZoneHalfSpeed() {
   if (!PARAMETERS->GetUseParallelComputing())
     return;
 
+  int rank = PARAMETERS->GetProcessID();
+  int size = PARAMETERS->GetProcessesQ();
+
+  int next, prev;
+
   for (sep::Axis ax=sep::X; ax<=sep::Z; ax = (sep::Axis)((int)ax + 1)) {
 
-    if (SOLVER->GetGridNeighbors()[ax].prev != -1) {
-      // should develop and test exchange algorithm
+    next = SOLVER->GetGridNeighbors()[ax].next;
+    prev = SOLVER->GetGridNeighbors()[ax].prev;
+
+    if (rank % 2) {
+
+      if (next != -1) {
+
+        // here we should send all right edge cells
+        // and recieve right obtained ones
+        //MPI_Sendrecv(&sendbuf,sendcount,sendtype,dest,sendtag,
+        //             &recvbuf,recvcount,recvtype,source,recvtag,
+        //             comm,&status);
+      }
+    } else {
+
     }
   }
+}
+
+
+void Solver::SendEdgeCells(sep::Axis axis, bool is_right, int dest /* should
+                                                                       make it
+                                                                       for the
+                                                                       half
+                                                                       speed
+                                                                       too!!! */) {
+  // TODO: to implement
+  // maybe we should make cells keeped in array first!
+  //if (is_right)
+  //for(blah blah blah)
+}
+
+
+void Solver::RecieveObtainedCells(sep::Axis axis, bool is_right, int src) {
+  // TODO: to implement
 }
 
 
