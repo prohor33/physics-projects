@@ -15,6 +15,7 @@ cmake_minimum_required(VERSION 2.6)
           integral.cpp
           manager.cpp
           out_result.cpp
+          parallel.cpp
           parameters.cpp
           solver.cpp
           test.cpp

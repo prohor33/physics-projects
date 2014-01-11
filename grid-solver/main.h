@@ -15,6 +15,11 @@ using namespace std;
 
 namespace sep { // my separator namespace
 
+  enum SpeedType {
+    Speed = 0,
+    HalfSpeed = 1
+  };
+
   enum {
     INDEX = 3
   };

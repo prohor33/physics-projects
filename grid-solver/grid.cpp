@@ -12,8 +12,10 @@ Grid::Grid() {
   // initialize cells for first gas
   InitGasCells(sep::FIRST);
 
-  // initialize cells for second gas
-  InitGasCells(sep::SECOND);
+  if (PARAMETERS->GetSecondGasIsActive()) {
+    // initialize cells for second gas
+    InitGasCells(sep::SECOND);
+  }
 }
 
 
@@ -38,8 +40,6 @@ void Grid::InitGasCells(
     std::vector<int> size
     ) {
 
-  // TODO: we should initialize only grid for that process
-
   Cell****& cells = cells_[gas_numb];
 
   Cell* cell;
@@ -57,9 +57,9 @@ void Grid::InitGasCells(
 
   int n, m, p;
 
-  n = start[sep::X] + size[sep::X];
-  m = start[sep::Y] + size[sep::Y];
-  p = start[sep::Z] + size[sep::Z];
+  n = size[sep::X];
+  m = size[sep::Y];
+  p = size[sep::Z];
 
   size_ = vector<int>(3);
   size_[sep::X] = size[sep::X];
@@ -73,17 +73,20 @@ void Grid::InitGasCells(
   cells = new Cell***[size[sep::X]];
 
   // initialize cells for our gas
-  for (int i=0; i<size[sep::X];i++) {
+  for (int i=0; i<n;i++) {
 
     cells[i] = new Cell**[size[sep::Y]];
 
-    for (int j=0; j<size[sep::Y]; j++) {
+    for (int j=0; j<m; j++) {
 
       cells[i][j] = new Cell*[size[sep::Z]];
 
-      for (int k=0; k<size[sep::Z]; k++) {
+      for (int k=0; k<p; k++) {
 
-        switch (GRID_FILE_READER->cells()[i][j][k]->type) {
+        CellInitData* gfr_cell = GRID_FILE_READER->
+           cells()[start[sep::X]+i][start[sep::Y]+j][start[sep::Z]+k];
+
+        switch  (gfr_cell->type) {
         case CellInitData::CIDT_NONE:
 
           cell = new Cell(gas_numb, Cell::NONE);
@@ -97,18 +100,18 @@ void Grid::InitGasCells(
         case CellInitData::CIDT_NORMAL:
         case CellInitData::CIDT_FAKE:
 
-          if (GRID_FILE_READER->cells()[i][j][k]->type ==
+          if (gfr_cell->type ==
               CellInitData::CIDT_NORMAL)
             cell = new Cell(gas_numb, Cell::NORMAL);
           else
             cell = new Cell(gas_numb, Cell::FAKE);
 
           cell->wall_t()[sep::X] =
-            GRID_FILE_READER->cells()[i][j][k]->T_start[sep::X];
+            gfr_cell->T_start[sep::X];
           cell->wall_t()[sep::Y] =
-            GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Y];
+            gfr_cell->T_start[sep::Y];
           cell->wall_t()[sep::Z] =
-            GRID_FILE_READER->cells()[i][j][k]->T_start[sep::Z];
+            gfr_cell->T_start[sep::Z];
 
 
           cell->SetSpaceCoord(i, j, k);

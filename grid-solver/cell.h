@@ -51,6 +51,9 @@ class Cell {
   inline double& speed(vector<int>& coord) {
     return speed_[coord[sep::INDEX]];
   }
+
+  vector<double>& speed_half() { return speed_half_; };
+
   inline double& speed_half(vector<int> coord) {
     return speed_half_[coord[sep::INDEX]];
   }

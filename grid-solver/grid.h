@@ -30,7 +30,7 @@ class Grid {
     return cells_[gas_number];
   }
 
-  vector<int>& size() {
+  const vector<int>& size() {
     return size_;
   }
 

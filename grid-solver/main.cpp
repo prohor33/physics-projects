@@ -3,6 +3,8 @@
 #include "parameters.h"
 #include "manager.h"
 #include "out_result.h"
+#include "parallel.h"
+
 
 int main(int argc, char *argv[]) {
 
@@ -34,6 +36,9 @@ int main(int argc, char *argv[]) {
   //OUT_RESULT->ProcessParameters(sep::FIRST);
   //OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
   //OUT_RESULT->OutParameters(sep::FIRST);
+
+  // TODO: should translate this ti SOLVER->Finalize() o smt like that
+  PARALLEL->FinalizeMPI();
 
   return 0;
 }

@@ -76,7 +76,7 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
   vector<int> coord(3);
   Cell* cell;
-  vector<int>& size = SOLVER->grid()->size();
+  const vector<int>& size = SOLVER->grid()->size();
 
   for(int i=0; i<size[sep::X]; i++) {
     for(int j=0; j<size[sep::Y]; j++) {
@@ -84,7 +84,7 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
         cell = SOLVER->grid()->cells()[gas_numb][i][j][k];
 
-        if (cell->type() != Cell::NORMAL) {
+        if (cell->type() != Cell::NORMAL || cell->obtained()) {
 
           // TODO: make it global coordinate
           // actually we shoild develop another
@@ -163,7 +163,7 @@ void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
   double whole_mass = 0;
 
   Cell* cell;
-  vector<int>& size = SOLVER->grid()->size();
+  const vector<int>& size = SOLVER->grid()->size();
 
   for(int i=0; i<size[sep::X]; i++) {
     for(int j=0; j<size[sep::Y]; j++) {
@@ -171,7 +171,7 @@ void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
 
         cell = SOLVER->grid()->cells()[gas_numb][i][j][k];
 
-        if (cell->type() != Cell::NORMAL)
+        if (cell->type() != Cell::NORMAL || cell->obtained())
           continue;
 
         double n = 0.0;

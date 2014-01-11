@@ -47,7 +47,7 @@ void Integral::Iteration() {
   double m2 = PARAMETERS->GetMolMass(sep::SECOND);
 
   Cell *cell1, *cell2;
-  vector<int>& size = SOLVER->grid()->size();
+  const vector<int>& size = SOLVER->grid()->size();
 
   // 1<->1
   {

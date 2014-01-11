@@ -2,6 +2,7 @@
 #include "out_result.h"
 #include "parameters.h"
 #include "integral.h"
+#include "parallel.h"
 
 string sep::int_to_string(int i) {
 
@@ -16,11 +17,13 @@ string sep::int_to_string(int i) {
 
 void Solver::Compute() {
 
+  cout << "Start computing..." << endl;
+
   OUT_RESULT->CheckMassConservation(sep::FIRST);
 
   MeasureTime();
 
-  int iterations = 1;
+  int iterations = 2;
 
   for (int i=0; i<iterations; i++) {
 
@@ -75,61 +78,22 @@ void Solver::MakeStep(sep::Axis axis, double dt) {
 }
 
 
-void Solver::ExchangeEdgeZoneHalfSpeed() {
-  // TODO: to implement
+void Solver::ExchangeEdgeZoneSpeed() {
 
   if (!PARAMETERS->GetUseParallelComputing())
     return;
 
-  int rank = PARAMETERS->GetProcessID();
-  int size = PARAMETERS->GetProcessesQ();
-
-  int next, prev;
-
-  for (sep::Axis ax=sep::X; ax<=sep::Z; ax = (sep::Axis)((int)ax + 1)) {
-
-    next = SOLVER->GetGridNeighbors()[ax].next;
-    prev = SOLVER->GetGridNeighbors()[ax].prev;
-
-    if (rank % 2) {
-
-      if (next != -1) {
-
-        // here we should send all right edge cells
-        // and recieve right obtained ones
-        //MPI_Sendrecv(&sendbuf,sendcount,sendtype,dest,sendtag,
-        //             &recvbuf,recvcount,recvtype,source,recvtag,
-        //             comm,&status);
-      }
-    } else {
-
-    }
-  }
+  PARALLEL->ExchangeEdgeZone(sep::Speed);
 }
 
+void Solver::ExchangeEdgeZoneHalfSpeed() {
 
-void Solver::SendEdgeCells(sep::Axis axis, bool is_right, int dest /* should
-                                                                       make it
-                                                                       for the
-                                                                       half
-                                                                       speed
-                                                                       too!!! */) {
-  // TODO: to implement
-  // maybe we should make cells keeped in array first!
-  //if (is_right)
-  //for(blah blah blah)
+  if (!PARAMETERS->GetUseParallelComputing())
+    return;
+
+  PARALLEL->ExchangeEdgeZone(sep::HalfSpeed);
 }
 
-
-void Solver::RecieveObtainedCells(sep::Axis axis, bool is_right, int src) {
-  // TODO: to implement
-}
-
-
-void Solver::ExchangeEdgeZoneSpeed() {
-  // TODO: to implement
-  //cout << "ExchangeEdgeZoneSpeed" << endl;
-}
 
 void Solver::MeasureTime(int iterations) {
 

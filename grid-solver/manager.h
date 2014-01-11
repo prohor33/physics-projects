@@ -22,7 +22,6 @@ class Manager {
   Manager() {};
   ~Manager() {};
 
-
 };
 
 #define MANAGER Manager::Instance()
