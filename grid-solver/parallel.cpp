@@ -30,7 +30,7 @@ void Parallel::ExchangeEdgeZone(sep::SpeedType sp_type) {
 
   int rank = PARAMETERS->GetProcessID();
 
-  cout << "r: " << rank << " start exchanging!" << endl;
+//  cout << "r: " << rank << " start exchanging!" << endl;
 
   int next, prev;
   vector<int> start_s(3);
@@ -54,7 +54,7 @@ void Parallel::ExchangeEdgeZone(sep::SpeedType sp_type) {
       // SendRecieve with next first
       if (next != -1) {
 
-        cout << "r: " << rank << " SendRecieve with next first." << endl;
+//        cout << "r: " << rank << " SendRecieve with next first." << endl;
         start_s[ax] = SOLVER->grid()->size()[ax] - 4; // or should be -3??
         SendRecieveCellsBlock(start_s, size, 2, ax, sp_type, next);
       }
@@ -62,19 +62,17 @@ void Parallel::ExchangeEdgeZone(sep::SpeedType sp_type) {
       // SendRecieve with prev after that
       if (prev != -1) {
 
-        cout << "r: " << rank << " SendRecieve with prev after that." << endl;
+//        cout << "r: " << rank << " SendRecieve with prev after that." << endl;
         start_s[ax] = 2;
         SendRecieveCellsBlock(start_s, size, -2, ax, sp_type, prev);
       }
     } else {
       // for odd rank
 
-      cout << "r: " << rank << " odd" << endl;
-
       // SendRecieve with prev first
       if (prev != -1) {
 
-        cout << "r: " << rank << " SendRecieve with prev first." << endl;
+//        cout << "r: " << rank << " SendRecieve with prev first." << endl;
         start_s[ax] = 2;
         SendRecieveCellsBlock(start_s, size, -2, ax, sp_type, prev);
       }
@@ -82,7 +80,7 @@ void Parallel::ExchangeEdgeZone(sep::SpeedType sp_type) {
       // SendRecieve with next after that
       if (next != -1) {
 
-        cout << "r: " << rank << " SendRecieve with next after that." << endl;
+//        cout << "r: " << rank << " SendRecieve with next after that." << endl;
         start_s[ax] = SOLVER->grid()->size()[ax] - 4;
         SendRecieveCellsBlock(start_s, size, 2, ax, sp_type, next);
       }
@@ -100,15 +98,15 @@ void Parallel::SendRecieveCellsBlock(vector<int>& start_s, vector<int>& size,
 
   int rank = PARAMETERS->GetProcessID();
 
-  cout << "r: " << rank << " start_s[X] = " << start_s[axis] <<
-      " grid.size()[X] = " << SOLVER->grid()->size()[axis] <<
-      " axis = " << axis << endl;
-
-
-  cout << "r: " << PARAMETERS->GetProcessID() << " SendRecvCellBlock" << endl;
-  cout << "r: " << PARAMETERS->GetProcessID() << " start_s = " <<
-      start_s[sep::X] << endl;
-  cout << "r: " << PARAMETERS->GetProcessID() << " axis = " << axis << endl;
+//  cout << "r: " << rank << " start_s[X] = " << start_s[axis] <<
+//      " grid.size()[X] = " << SOLVER->grid()->size()[axis] <<
+//      " axis = " << axis << endl;
+//
+//
+//  cout << "r: " << PARAMETERS->GetProcessID() << " SendRecvCellBlock" << endl;
+//  cout << "r: " << PARAMETERS->GetProcessID() << " start_s = " <<
+//      start_s[sep::X] << endl;
+//  cout << "r: " << PARAMETERS->GetProcessID() << " axis = " << axis << endl;
 
   // for each cell should do Sendrecv()
   for (int i=0; i<size[sep::X]; i++) {
@@ -127,8 +125,8 @@ void Parallel::SendRecieveCellsBlock(vector<int>& start_s, vector<int>& size,
     }
   }
 
-  cout << "rank: " << PARAMETERS->GetProcessID() <<
-      " succesfully send and recieve all data with dest = " << dest << endl;
+//  cout << "rank: " << PARAMETERS->GetProcessID() <<
+//      " succesfully send and recieve all data with dest = " << dest << endl;
 
 }
 
@@ -161,9 +159,6 @@ void Parallel::SendRecieveCell(vector<int> cell_s_c,
     vector<double>& speed_r = sp_type != sep::HalfSpeed ? cell_r->speed() :
         cell_r->speed_half();
 
-//    cout << "r: " << rank << " Checking cells: ";
-//    cout << speed_s.size() << " " << speed_r.size() << endl;
-//
 //    cout << "r: " << rank << " Want to sent: " <<
 //        "coord_s: " << cell_s_c[sep::X] << " " <<
 //        cell_s_c[sep::Y] << " " <<
@@ -186,19 +181,21 @@ void Parallel::SendRecieveCell(vector<int> cell_s_c,
           " res = " << res << endl;
     }
 
-    MPI_Get_count(&status, MPI_INT, &recieved_n);
+    MPI_Get_count(&status, MPI_DOUBLE, &recieved_n);
 
-    if (recieved_n != speed_s.size() + speed_r.size()) {
+    if (recieved_n != speed_r.size()) {
       cout << "r: " << PARAMETERS->GetProcessID() <<
           " error: recieve only " << recieved_n << " doubles. " <<
-         "But should recieve " << speed_s.size() +
+         "But should recieve " <<
          speed_r.size() << " doubles." << endl;
 
-//      cout << "Some additional information: " << endl <<
-//          "coord_r: " << cell_r_c[sep::X] << " " <<
-//          cell_r_c[sep::Y] << " " <<
-//          cell_r_c[sep::Z] << endl <<
-//          "cell_r::type: " << cell_r->type() << endl;
+      cout << "Some additional information: " << endl <<
+          "coord_r: " << cell_r_c[sep::X] << " " <<
+          cell_r_c[sep::Y] << " " <<
+          cell_r_c[sep::Z] << endl <<
+          "cell_r::type: " << cell_r->type() << endl;
+
+      exit(-1);
     }
   }
 }

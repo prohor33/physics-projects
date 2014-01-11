@@ -10,7 +10,8 @@ gas_index = 0;
 
 data = np.loadtxt("test_T_gas" + str(gas_index) + ".result")
 
-size_x = 20;
+#size_x = 20;
+size_x = 13;
 size_y = 25;
 #size_x = 35
 #size_y = 25
