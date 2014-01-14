@@ -25,13 +25,7 @@ class Cell {
 
  public:
 
-  enum CellType {
-    NONE = 0,
-    NORMAL = 1,
-    FAKE = 2,
-  };
-
-  Cell(sep::GasNumb gas_numb, CellType type=NORMAL);
+  Cell(sep::GasNumb gas_numb, sep::CellType type=sep::NORMAL);
 
   ~Cell() {};
 
@@ -72,7 +66,7 @@ class Cell {
 
   vector<int>& GetSpeedCoord(int index);
 
-  CellType type() { return type_; };
+  sep::CellType type() { return type_; };
 
   vector<double>& wall_t() { return wall_t_; };
 
@@ -101,7 +95,7 @@ class Cell {
 
   vector<CellNeighbor> neighbor_;  // for x, y, z axis
   sep::GasNumb gas_numb_;
-  CellType type_;
+  sep::CellType type_;
 
   vector<int> space_coord_;
 

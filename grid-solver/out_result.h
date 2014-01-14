@@ -31,10 +31,6 @@ class OutResult {
 
  public:
 
-  enum OutType {
-    OUT_FOR_PYTHON
-  };
-
   static OutResult* Instance() {
     static OutResult OutResult_;
     return &OutResult_;
@@ -42,9 +38,16 @@ class OutResult {
 
   void OutParameters(sep::GasNumb gas_numb);
 
+  void OutParameter(sep::Parameter par, sep::GasNumb gas_numb);
+
+  void OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb);
+
+  void OutParameterSingletone(sep::Parameter par,
+    sep::GasNumb gas_numb);
+
   void ProcessParameters(sep::GasNumb gas_numb);
 
-  void SetOutputType(OutType output_type) {
+  void SetOutputType(sep::OutType output_type) {
     output_type_ = output_type;
   }
 
@@ -58,7 +61,7 @@ class OutResult {
 
  protected:
 
-  OutType output_type_;
+  sep::OutType output_type_;
 
   vector<CellParameters> parameters_[2];  // two gases
 

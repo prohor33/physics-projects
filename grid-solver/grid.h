@@ -34,6 +34,10 @@ class Grid {
     return size_;
   }
 
+  const vector<int>& start() {
+    return start_;
+  }
+
  private:
 
   void InitGasCells(

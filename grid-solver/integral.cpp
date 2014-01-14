@@ -59,7 +59,7 @@ void Integral::Iteration() {
 
           cell1 = SOLVER->grid()->cells()[0][i][j][k];
 
-          if (cell1->type() != Cell::NORMAL)
+          if (cell1->type() != sep::NORMAL)
             continue;
 
           FillInput(cell1, NULL);
@@ -84,7 +84,7 @@ void Integral::Iteration() {
           cell1 = SOLVER->grid()->cells()[0][i][j][k];
           cell2 = SOLVER->grid()->cells()[1][i][j][k];
 
-          if (cell1->type() != Cell::NORMAL)
+          if (cell1->type() != sep::NORMAL)
             continue;
 
           FillInput(cell1, cell2);
@@ -105,7 +105,7 @@ void Integral::Iteration() {
 
           cell2 = SOLVER->grid()->cells()[1][i][j][k];
 
-          if (cell2->type() != Cell::NORMAL)
+          if (cell2->type() != sep::NORMAL)
             continue;
 
           FillInput(NULL, cell2);

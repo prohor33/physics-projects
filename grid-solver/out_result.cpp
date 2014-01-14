@@ -3,94 +3,196 @@
 #include "grid.h"
 #include "cell.h"
 #include "parameters.h"
+#include <stdlib.h>
 
 
 void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
-  int z_layer = 5;
+  OutParameter(sep::T, gas_numb);
+  //OutParameter(sep::n, gas_numb);
+}
 
-  z_layer = PARAMETERS->GetUseZAxis() ? z_layer : 0;
+
+void OutResult::OutParameter(sep::Parameter par, sep::GasNumb gas_numb) {
+  if (PARAMETERS->GetUseParallelComputing()) {
+    SetOutputType(sep::OUT_BINARY_FILE);
+    OutParameterMPI(par, gas_numb);
+  }
+  else {
+    SetOutputType(sep::OUT_TXT_FILE);
+    OutParameterSingletone(par, gas_numb);
+  }
+}
+
+
+void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
+
+  char file_name[] = "final.dat";
+
+  int rank, size;
+  int parameters_q = parameters_[gas_numb].size();
+
+  rank = PARAMETERS->GetProcessID();
+  size = PARAMETERS->GetProcessesQ();
+
+  MPI_Status status_par;
+  int start_p = 0;
+
+  // finding out start position for this process
+  if (rank == 0) {
+
+    remove(file_name);
+
+    MPI_Send(&parameters_q, 1, MPI_INT, rank+1, 123, MPI_COMM_WORLD);
+
+  } else if (rank == size-1) {
+
+    MPI_Recv(&start_p, 1, MPI_INT, rank-1, 123, MPI_COMM_WORLD,
+        &status_par);
+
+  } else {
+
+    MPI_Recv(&start_p, 1, MPI_INT, rank-1, 123, MPI_COMM_WORLD,
+        &status_par);
+    int new_start_p = start_p + parameters_q;
+    MPI_Send(&new_start_p, 1, MPI_INT, rank+1, 123, MPI_COMM_WORLD);
+
+  }
+
+  cout << "r: " << rank << " start_p: " << start_p <<
+   " parameters_q: " << parameters_q << endl;
+
+  int par_size = sizeof(int)*3 + sizeof(double);
+
+  MPI_Offset offset = par_size * start_p;
+  MPI_File file;
+  MPI_Status status;
+
+  // opening one shared file
+  MPI_File_open(MPI_COMM_WORLD, file_name, MPI_MODE_CREATE|MPI_MODE_WRONLY,
+                MPI_INFO_NULL, &file);
+
+  MPI_File_seek(file, offset, MPI_SEEK_SET);
+
+  switch (output_type_) {
+
+  case sep::OUT_BINARY_FILE: {
+
+    vector<CellParameters>::iterator cii;
+
+    for (cii=parameters_[gas_numb].begin();
+        cii!=parameters_[gas_numb].end(); ++cii) {
+
+      CellParameters& cell_par = *cii;
+
+      double rank_d = rank;
+      MPI_File_write(file, &cell_par.coord[0], 3, MPI_INT, &status);
+      MPI_File_write(file, &cell_par.T, 1, MPI_DOUBLE, &status);
+    }
+    break;
+  }
+  default:
+    cout << "error: there is no such output type" << endl;
+    break;
+  }
+
+  MPI_File_close(&file);
+}
+
+
+void OutResult::OutParameterSingletone(sep::Parameter par,
+    sep::GasNumb gas_numb) {
 
   vector<Cell*> cells_z;
 
-  // out T
-  ofstream out_T_file;
-  out_T_file.open(string("test_T_gas" + sep::int_to_string(gas_numb) +
+  ofstream out_par_file;
+
+  string par_str;
+  switch (par) {
+    case sep::T:
+      par_str = string("T");
+      break;
+    case sep::n:
+      par_str= string("n");
+      break;
+  }
+
+  out_par_file.open((string("test_") + par_str + string("_gas") +
+      sep::int_to_string(gas_numb) +
         ".result").c_str());
 
   switch (output_type_) {
 
-  case OUT_FOR_PYTHON:
+    case sep::OUT_TXT_FILE: {
 
-    vector<CellParameters>::iterator cii;
+      vector<CellParameters>::iterator cii;
 
-    for (cii=parameters_[gas_numb].begin();
-        cii!=parameters_[gas_numb].end(); ++cii) {
+      for (cii=parameters_[gas_numb].begin();
+          cii!=parameters_[gas_numb].end(); ++cii) {
 
-      if ((*cii).coord[sep::Z] != z_layer)
-        continue;
+        double par_v;
+        switch (par) {
+          case sep::T:
+            par_v = (*cii).T;
+            break;
+          case sep::n:
+            par_v = (*cii).n;
+            break;
+        }
 
-      out_T_file << (*cii).coord[sep::X] << " " <<
-          (*cii).coord[sep::Y] << " " <<
-          (*cii).coord[sep::Z] << " " <<
-          (*cii).T << endl;
+        out_par_file << (*cii).coord[sep::X] << " " <<
+            (*cii).coord[sep::Y] << " " <<
+            (*cii).coord[sep::Z] << " " <<
+            par_v << endl;
+      }
+      break;
     }
-    break;
+    default:
+      cout << "error: there is no such output type" << endl;
+      break;
   }
 
-  out_T_file.close();
-
-
-  // out n
-  ofstream out_n_file;
-  out_n_file.open(string("test_n_gas" + sep::int_to_string(gas_numb) +
-        ".result").c_str());
-
-  switch (output_type_) {
-
-  case OUT_FOR_PYTHON:
-
-    vector<CellParameters>::iterator cii;
-
-    for (cii=parameters_[gas_numb].begin();
-        cii!=parameters_[gas_numb].end(); ++cii) {
-
-      if ((*cii).coord[sep::Z] != z_layer)
-        continue;
-
-      out_n_file << (*cii).coord[sep::X] << " " <<
-          (*cii).coord[sep::Y] << " " <<
-          (*cii).coord[sep::Z] << " " <<
-          (*cii).n << endl;
-    }
-    break;
-  }
-
-  out_n_file.close();
+  out_par_file.close();
 }
 
 // prepare parameters to be printed out
 void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
+
+  int z_layer = PARAMETERS->GetUseZAxis() ? 5 : 0;
+
+  // clean up previous results
+  parameters_[gas_numb].clear();
 
   vector<double>::iterator cii;
 
   vector<int> coord(3);
   Cell* cell;
   const vector<int>& size = SOLVER->grid()->size();
+  const vector<int>& start = SOLVER->grid()->start();
+  vector<int> actual_cell_c(3);
 
   for(int i=0; i<size[sep::X]; i++) {
     for(int j=0; j<size[sep::Y]; j++) {
       for(int k=0; k<size[sep::Z]; k++) {
 
+        // will compute only one layer for a while
+        if (k != z_layer)
+          continue;
+
         cell = SOLVER->grid()->cells()[gas_numb][i][j][k];
 
-        if (cell->type() != Cell::NORMAL || cell->obtained()) {
+        actual_cell_c = cell->space_coord();
+        actual_cell_c[sep::X] += start[sep::X];
+        actual_cell_c[sep::Y] += start[sep::Y];
+        actual_cell_c[sep::Z] += start[sep::Z];
 
-          // TODO: make it global coordinate
-          // actually we shoild develop another
-          // way to output results in parallel case
+        if (cell->obtained())
+          continue;
+
+        if (cell->type() != sep::NORMAL) {
+
           parameters_[gas_numb].push_back(
-            CellParameters(cell->space_coord(), 0.0, 0.0));
+            CellParameters(actual_cell_c, 0.0, 0.0));
 
           continue;
         }
@@ -145,7 +247,7 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         T /= 3;
 
         parameters_[gas_numb].push_back(
-            CellParameters(cell->space_coord(), T, n));
+            CellParameters(actual_cell_c, T, n));
       }
     }
   }
@@ -171,7 +273,7 @@ void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
 
         cell = SOLVER->grid()->cells()[gas_numb][i][j][k];
 
-        if (cell->type() != Cell::NORMAL || cell->obtained())
+        if (cell->type() != sep::NORMAL || cell->obtained())
           continue;
 
         double n = 0.0;

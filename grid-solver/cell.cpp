@@ -9,14 +9,14 @@ CellNeighbor::CellNeighbor(
     prev(prev_c)
 {
   // some cheat, but we strongly need it
-  if (next && next->type() == Cell::NONE)
+  if (next && next->type() == sep::NONE)
     next = NULL;
 
-  if (prev && prev->type() == Cell::NONE)
+  if (prev && prev->type() == sep::NONE)
     prev = NULL;
 };
 
-Cell::Cell(sep::GasNumb gas_numb, CellType type) :
+Cell::Cell(sep::GasNumb gas_numb, sep::CellType type) :
     gas_numb_(gas_numb),
     type_(type),
     obtained_(false)
@@ -26,7 +26,7 @@ Cell::Cell(sep::GasNumb gas_numb, CellType type) :
 
   vector<int> coord;
 
-  if (type_ == NONE)  // empty cell
+  if (type_ == sep::NONE)  // empty cell
     return;
 
   double n = 1.0;
@@ -154,22 +154,16 @@ inline vector<int>& Cell::GetSpeedCoord(int index) {
 
 void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
-  if (type_ != NORMAL || obtained_) {
+  if (type_ != sep::NORMAL || obtained_) {
     return;
   }
 
-  if (!neighbor_[axis].next->neighbor_[axis].next ||
-      (neighbor_[axis].next->type() == FAKE &&
-       neighbor_[axis].next->neighbor_[axis].next->type() == FAKE)) {
-
+  if (neighbor_[axis].next->type() == sep::FAKE) {
     ComputeHalfSpeedNextIsBorder(axis, dt);
     return;
   }
 
-  if (!neighbor_[axis].prev->neighbor_[axis].prev ||
-      (neighbor_[axis].prev->type() == FAKE &&
-       neighbor_[axis].prev->neighbor_[axis].prev->type() == FAKE)) {
-
+  if (neighbor_[axis].prev->type() == sep::FAKE) {
     ComputeHalfSpeedPrevIsBorder(axis, dt);
     return;
   }
@@ -206,7 +200,7 @@ void Cell::ComputeHalfSpeed(sep::Axis axis, double dt) {
 
 void Cell::ComputeSpeed(sep::Axis axis, double dt) {
 
-  if (type_ != NORMAL || obtained_) {
+  if (type_ != sep::NORMAL || obtained_) {
     return;
   }
 
@@ -261,7 +255,8 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed < 0
 
       neighbor_[axis].prev->speed(coord) =
-        sep::max((double)0.0, 2.0f * speed(coord) - neighbor_[axis].next->speed(coord));
+        sep::max((double)0.0, 2.0f * speed(coord) -
+                 neighbor_[axis].next->speed(coord));
 
       neighbor_[axis].prev->speed_half(coord) = speed(coord) -
         (1.0 - fabs(gamma)) / 2.0f * Limiter(axis, coord);
@@ -301,9 +296,11 @@ void Cell::ComputeHalfSpeedPrevIsBorder(sep::Axis axis, double dt) {
       // for speed > 0
 
       neighbor_[axis].prev->speed_half(coord) =
-         numenator1 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_[axis]));
+         numenator1 / denominator * exp((-1.0f) * p2 /
+                                        (2.0f * MolMass() * wall_t_[axis]));
 
-      g = numenator2 / denominator * exp((-1.0f) * p2 / (2.0f * MolMass() * wall_t_[axis]));
+      g = numenator2 / denominator * exp((-1.0f) * p2 /
+                                         (2.0f * MolMass() * wall_t_[axis]));
 
       neighbor_[axis].prev->speed(coord) =
         sep::max((double)0.0, 2.0f * g - speed(coord));

@@ -31,6 +31,9 @@ Grid::Grid(
     // initialize cells for second gas
     InitGasCells(sep::SECOND, start, size);
   }
+
+  // release input file data
+  GRID_FILE_READER->cells().clear();
 }
 
 
@@ -89,7 +92,7 @@ void Grid::InitGasCells(
         switch  (gfr_cell->type) {
         case CellInitData::CIDT_NONE:
 
-          cell = new Cell(gas_numb, Cell::NONE);
+          cell = new Cell(gas_numb, sep::NONE);
 
           cell->SetSpaceCoord(i, j, k);
 
@@ -102,9 +105,9 @@ void Grid::InitGasCells(
 
           if (gfr_cell->type ==
               CellInitData::CIDT_NORMAL)
-            cell = new Cell(gas_numb, Cell::NORMAL);
+            cell = new Cell(gas_numb, sep::NORMAL);
           else
-            cell = new Cell(gas_numb, Cell::FAKE);
+            cell = new Cell(gas_numb, sep::FAKE);
 
           cell->wall_t()[sep::X] =
             gfr_cell->T_start[sep::X];
@@ -112,7 +115,6 @@ void Grid::InitGasCells(
             gfr_cell->T_start[sep::Y];
           cell->wall_t()[sep::Z] =
             gfr_cell->T_start[sep::Z];
-
 
           cell->SetSpaceCoord(i, j, k);
 
@@ -217,12 +219,12 @@ void Grid::InitGasCells(sep::GasNumb gas_numb) {
             ((k == 0 || k == p-1) && PARAMETERS->GetUseZAxis())) {
           // fake cells
 
-          cell = new Cell(gas_numb, Cell::FAKE);
+          cell = new Cell(gas_numb, sep::FAKE);
         }
         else {
           // normal cells
 
-          cell = new Cell(gas_numb, Cell::NORMAL);
+          cell = new Cell(gas_numb, sep::NORMAL);
 
           if (i == 1 || i == n-2 ||
               j == 1 || j == m-2 ||

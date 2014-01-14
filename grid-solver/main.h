@@ -15,6 +15,22 @@ using namespace std;
 
 namespace sep { // my separator namespace
 
+  enum CellType {
+    NONE = 0,
+    NORMAL = 1,
+    FAKE = 2,
+  };
+
+  enum OutType {
+    OUT_BINARY_FILE,
+    OUT_TXT_FILE
+  };
+
+  enum Parameter {
+    T = 0,
+    n = 1
+  };
+
   enum SpeedType {
     Speed = 0,
     HalfSpeed = 1

@@ -6,7 +6,7 @@ grid-solver
 # result files
 
 *.result
-
+*.dat
 
 # result directory
 

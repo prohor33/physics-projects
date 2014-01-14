@@ -25,7 +25,8 @@ int main(int argc, char *argv[]) {
 
   PARAMETERS->SetUseCollisionIntegral(false);
 
-  OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
+  // output type will changed wether singletone mode is active
+  OUT_RESULT->SetOutputType(sep::OUT_BINARY_FILE);
 
   PARAMETERS->Initialize(); // should be first initialization
 
@@ -34,7 +35,6 @@ int main(int argc, char *argv[]) {
   SOLVER->Compute();
 
   //OUT_RESULT->ProcessParameters(sep::FIRST);
-  //OUT_RESULT->SetOutputType(OutResult::OUT_FOR_PYTHON);
   //OUT_RESULT->OutParameters(sep::FIRST);
 
   // TODO: should translate this ti SOLVER->Finalize() o smt like that
