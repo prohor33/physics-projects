@@ -4,7 +4,7 @@ from pylab import *
 import mpl_toolkits.mplot3d.axes3d as p3
 import struct
 
-fin = open("final.dat", "rb")
+fin = open("result_T_gas_0.dat", "rb")
 
 size_x = 35;
 size_y = 25;

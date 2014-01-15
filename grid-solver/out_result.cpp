@@ -27,7 +27,20 @@ void OutResult::OutParameter(sep::Parameter par, sep::GasNumb gas_numb) {
 
 void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
 
-  char file_name[] = "final.dat";
+  string par_str;
+  string filename_str;
+
+  switch (par) {
+  case sep::T:
+    par_str = string("T");
+    break;
+  case sep::n:
+    par_str = string("n");
+    break;
+  }
+
+  filename_str = string("result_" + par_str + "_gas_" +
+      sep::int_to_string(gas_numb) + ".dat");
 
   int rank, size;
   int parameters_q = parameters_[gas_numb].size();
@@ -41,7 +54,7 @@ void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
   // finding out start position for this process
   if (rank == 0) {
 
-    remove(file_name);
+    remove(filename_str.c_str());
 
     MPI_Send(&parameters_q, 1, MPI_INT, rank+1, 123, MPI_COMM_WORLD);
 
@@ -59,9 +72,6 @@ void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
 
   }
 
-  cout << "r: " << rank << " start_p: " << start_p <<
-   " parameters_q: " << parameters_q << endl;
-
   int par_size = sizeof(int)*3 + sizeof(double);
 
   MPI_Offset offset = par_size * start_p;
@@ -69,8 +79,8 @@ void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
   MPI_Status status;
 
   // opening one shared file
-  MPI_File_open(MPI_COMM_WORLD, file_name, MPI_MODE_CREATE|MPI_MODE_WRONLY,
-                MPI_INFO_NULL, &file);
+  MPI_File_open(MPI_COMM_WORLD, (char*)filename_str.c_str(),
+      MPI_MODE_CREATE|MPI_MODE_WRONLY, MPI_INFO_NULL, &file);
 
   MPI_File_seek(file, offset, MPI_SEEK_SET);
 
@@ -85,9 +95,19 @@ void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
 
       CellParameters& cell_par = *cii;
 
+      double par_v;
+      switch (par) {
+        case sep::T:
+          par_v = cell_par.T;
+          break;
+        case sep::n:
+          par_v = cell_par.n;
+          break;
+      }
+
       double rank_d = rank;
       MPI_File_write(file, &cell_par.coord[0], 3, MPI_INT, &status);
-      MPI_File_write(file, &cell_par.T, 1, MPI_DOUBLE, &status);
+      MPI_File_write(file, &par_v, 1, MPI_DOUBLE, &status);
     }
     break;
   }

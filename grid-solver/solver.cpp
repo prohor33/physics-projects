@@ -23,7 +23,7 @@ void Solver::Compute() {
 
   MeasureTime();
 
-  int iterations = 1;
+  int iterations = 5;
 
   for (int i=0; i<iterations; i++) {
 
@@ -33,7 +33,7 @@ void Solver::Compute() {
   }
 
   OUT_RESULT->ProcessParameters(sep::FIRST);
-  // TODO: this add new results to old one
+
   OUT_RESULT->OutParameters(sep::FIRST);
 
   cout << "Outputting results done." << endl;
@@ -57,8 +57,15 @@ void Solver::ComputeIteration(double dt) {
   if (PARAMETERS->GetUseZAxis())
     MakeStep(sep::Z, dt);
 
-  if (PARAMETERS->GetUseCollisionIntegral())
+  if (PARAMETERS->GetUseCollisionIntegral()) {
+
+    if (!PARAMETERS->GetSecondGasIsActive()) {
+      cout << "Error: no second gas, but integral." << endl;
+      exit(-1);
+    }
+
     INTEGRAL->Iteration();
+  }
 }
 
 

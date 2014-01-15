@@ -50,7 +50,13 @@ class Parameters {
     return process_id_;
   }
 
-  void SetProcessesQ(int p_q) { processes_q_ = p_q; }
+  void SetProcessesQ(int p_q) {
+    if (p_q%2 != 0) {
+      cout << "Error: process quantity should be odd number, not " <<
+        p_q << endl;
+    }
+    processes_q_ = p_q;
+  }
 
   int GetProcessesQ() {
     return processes_q_;
