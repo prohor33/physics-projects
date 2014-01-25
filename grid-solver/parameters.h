@@ -51,7 +51,7 @@ class Parameters {
   }
 
   void SetProcessesQ(int p_q) {
-    if (p_q%2 != 0) {
+    if (p_q != 1 && p_q%2 != 0) {
       cout << "Error: process quantity should be odd number, not " <<
         p_q << endl;
     }
@@ -124,6 +124,23 @@ class Parameters {
     return gamma_[coord[sep::INDEX]];
   }
 
+  void SetInputGridFilename(const string& filename) {
+    input_grid_filename_ = filename;
+  }
+  const string& GetInputGridFilename() {
+    return input_grid_filename_;
+  }
+
+  void SetLogType(sep::LogType ltype);
+
+  void SetIterationQ(int q) {
+    iteration_q_ = q;
+  }
+  int GetIterationQ() {
+    return iteration_q_;
+  }
+
+  void OutTime();
 protected:
 
   Parameters();
@@ -160,6 +177,15 @@ protected:
   double p_cut_;
 
   vector<double> gamma_;
+
+  string input_grid_filename_;
+
+  streambuf* cout_backup_buf_;
+  streambuf* log_file_buf_;
+  ofstream log_file_str_;
+  sep::LogType log_type_;
+
+  int iteration_q_;
 };
 
 #define PARAMETERS Parameters::Instance()

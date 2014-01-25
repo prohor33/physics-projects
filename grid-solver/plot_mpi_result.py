@@ -6,13 +6,24 @@ import struct
 
 fin = open("result_T_gas_0.dat", "rb")
 
-size_x = 35;
-size_y = 25;
-
 dt = np.dtype([('x','i'),('y','i'),('z','i'),('value','d')])
 
 data = np.fromfile(fin, dtype=dt)
 #print data
+
+size_x = 0;
+size_y = 0;
+
+for i in range(0, data.size):
+  if data[i][0] > size_x:
+    size_x = data[i][0]
+  if data[i][1] > size_y:
+    size_y = data[i][1]
+
+size_x += 1
+size_y += 1
+
+print 'grid size: ', size_x, size_y
 
 X = np.zeros(shape = (size_x, size_y))
 Y = np.zeros(shape = (size_x, size_y))
@@ -25,8 +36,6 @@ for i in range(0, size_x):
     Y[i][j] = data[it][1]
     Z[i][j] = data[it][3]
     it+=1
-#print X[i][j], Y[i][j], Z[i][j]
-
 
 for i in range(0, size_x):
   for j in range(0, size_y):
@@ -45,7 +54,9 @@ p = ax.pcolormesh(X, Y, Z, cmap=cm.jet, vmin=Z.min(),
                 vmax=Z.max(), edgecolors = 'None')
 cb = fig.colorbar(p, ax=ax)
 
-#im.set_interpolation('none')
+# should do interpolation?
+#imshow(fig, interpolation='bilinear') #doesnt work
+#im.set_interpolation('none') # either
 #im.set_clim(0.8, 1.0)
 
 #colorbar(orientation='horizontal')

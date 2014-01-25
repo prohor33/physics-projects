@@ -1,13 +1,12 @@
 # binary
-
 grid-solver
 
-
 # result files
-
 *.result
 *.dat
 
 # result directory
-
 test_results/*
+
+# log directory
+logs/*

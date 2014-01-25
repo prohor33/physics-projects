@@ -15,6 +15,11 @@ using namespace std;
 
 namespace sep { // my separator namespace
 
+  enum LogType {
+    CONSOLE = 0,
+    LOG_FILE = 1
+  };
+
   enum CellType {
     NONE = 0,
     NORMAL = 1,

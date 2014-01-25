@@ -7,7 +7,7 @@ int main() {
 
   GRID_MAKER->BuildOurMainGrid();
 
-  GRID_MAKER->OutToFile("our_small.grid");
+  GRID_MAKER->OutToFile("pretty_big.grid");
 
   return 0;
 }

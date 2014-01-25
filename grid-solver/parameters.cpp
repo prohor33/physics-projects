@@ -1,6 +1,24 @@
 #include "parameters.h"
 
-Parameters::Parameters() {}
+Parameters::Parameters() :
+  mol_mass_gas1_(-1.0),
+  mol_mass_gas2_(-1.0),
+  time_step_(0),
+  limiter_(sep::Limiter(-1)),
+  process_id_(-1),
+  processes_q_(0),
+  second_gas_is_active_(false),
+  use_checking_mass_conservation_(false),
+  use_z_axis_(false),
+  use_parallel_computing_(false),
+  use_grid_from_input_file_(false),
+  use_collision_integral_(false),
+  speed_quantity_(false),
+  p_cut_(0),
+  cout_backup_buf_(NULL),
+  log_type_(sep::LogType(-1))
+{};
+
 
 void Parameters::Initialize() {
 
@@ -37,4 +55,45 @@ void Parameters::Initialize() {
       }
     }
   }
+}
+
+void Parameters::SetLogType(sep::LogType ltype) {
+  switch (ltype) {
+  case sep::CONSOLE:
+    if (cout_backup_buf_) {
+      cout.rdbuf(cout_backup_buf_); // restore buffer
+      log_file_str_.close();
+    }
+    break;
+  case sep::LOG_FILE:
+    stringstream log_filename;
+    time_t t = time(0);
+    struct tm * now = localtime( & t );
+
+    log_filename << "logs/"
+    <<  now->tm_mday << '-'
+    << (now->tm_mon + 1) << '-'
+    << (now->tm_year + 1900) << '_'
+    << now->tm_hour << ':'
+    << now->tm_min
+    << ".log";
+
+    log_file_str_.open (log_filename.str());
+    cout_backup_buf_ = cout.rdbuf();
+    log_file_buf_ = log_file_str_.rdbuf();
+    cout.rdbuf(log_file_buf_);
+
+    break;
+  }
+  log_type_ = ltype;
+}
+
+void Parameters::OutTime() {
+    time_t t = time(0);
+    struct tm * now = localtime( & t );
+
+    cout << now->tm_hour << ':'
+    << now->tm_min << ':'
+    << now->tm_sec
+    << " : ";
 }

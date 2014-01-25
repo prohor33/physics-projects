@@ -10,6 +10,8 @@
 
 void Manager::Initialize(int argc, char *argv[]) {
 
+  PARAMETERS->OutTime();
+
   SetParameters();
 
   PARALLEL->InitializeMPI(argc, argv);
@@ -34,7 +36,7 @@ void Manager::InitializeSolver() {
     return;
   }
 
-  GRID_FILE_READER->ReadFile("our_small.grid");
+  GRID_FILE_READER->ReadFile(PARAMETERS->GetInputGridFilename());
 
   int n, m, p;
 

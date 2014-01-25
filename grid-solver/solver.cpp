@@ -17,18 +17,22 @@ string sep::int_to_string(int i) {
 
 void Solver::Compute() {
 
-  cout << "Start computing..." << endl;
-
   OUT_RESULT->CheckMassConservation(sep::FIRST);
 
   MeasureTime();
 
-  int iterations = 5;
+  int iterations = PARAMETERS->GetIterationQ();
+
+  PARAMETERS->OutTime();
+
+  cout << "Let's do " << iterations << " iterations. ";
+  cout << "Start computing..." << endl;
 
   for (int i=0; i<iterations; i++) {
 
     ComputeIteration(1.0); // like_a_tau = 1.0, because of time_step = 0.02smth
 
+    PARAMETERS->OutTime();
     cout << "Iteration " << i << " done." << endl;
   }
 
@@ -36,6 +40,7 @@ void Solver::Compute() {
 
   OUT_RESULT->OutParameters(sep::FIRST);
 
+  PARAMETERS->OutTime();
   cout << "Outputting results done." << endl;
 
   MeasureTime(iterations);

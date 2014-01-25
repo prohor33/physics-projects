@@ -3,6 +3,7 @@
 #include "solver.h"
 #include "cell.h"
 
+
 void Parallel::InitializeMPI(int argc, char *argv[]) {
 
   MPI_Init (&argc, &argv);  /* starts MPI */
