@@ -64,7 +64,7 @@ cb = fig.colorbar(p, ax=ax)
 
 plt.title("Temperature")
 
-plt.savefig("mpi_plot.png")
+#plt.savefig("mpi_plot.png")
 
 plt.show()
 

@@ -71,7 +71,7 @@ class GridMaker {
 
   void BuildCubeGrid();
 
-  void BuildOurMainGrid();
+  void BuildOurMainGrid(int grid_option);
 
   void OutToFile(std::string file_name);
 

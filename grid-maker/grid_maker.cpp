@@ -195,26 +195,46 @@ void GridMaker::AddBox(vector<int> start, vector<int> size,
 
 
 // Build H type grid
-void GridMaker::BuildOurMainGrid() {
+void GridMaker::BuildOurMainGrid(int grid_option) {
 
-  int n, m, p;
-//  n = 35;
-//  m = 25;
-//  p = 10;
-//
-//  int D = 10;
-//  int l = m - 2*D;
-//  int d = 4;
-//  int h = 3;
+  int n, m, p, D, l, d, h;
+  int gaps_q;
 
-  n = 100;
-  m = 70;
-  p = 30;
+  switch (grid_option) {
+  case 0:
+    n = 35;
+    m = 25;
+    p = 10;
 
-  int D = 30;
-  int l = m - 2*D;
-  int d = 6;
-  int h = 7;
+    D = p;
+    l = m - 2*D;
+    d = 4;
+    h = 3;
+    gaps_q = 5;
+    break;
+  case 1:
+    n = 70;
+    m = 50;
+    p = 20;
+
+    D = p;
+    l = m - 2*D;
+    d = 4;
+    h = 3;
+    gaps_q = 5;
+    break;
+  case 2:
+    n = 100;
+    m = 70;
+    p = 30;
+
+    D = p;
+    l = m - 2*D;
+    d = 6;
+    h = 7;
+    gaps_q = 5;
+    break;
+  }
 
 
   FillInGridWithNulls(n, m, p);
@@ -261,7 +281,6 @@ void GridMaker::BuildOurMainGrid() {
   without_fakes[sep::Y] = true;
   without_fakes[sep::Z] = false;
 
-  int gaps_q = 5;
   int x_space = (n - ((gaps_q - 1)*(d + h) + d))/2;
 
   for (int i=0; i<gaps_q; i++) {

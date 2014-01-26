@@ -35,5 +35,5 @@ mpi-example/
 *.grid
 
 # some bash scripts
-copy_to_server
-connect_to_server
+copy_to_server*
+connect_to_server*

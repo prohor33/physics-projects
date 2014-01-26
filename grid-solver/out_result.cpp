@@ -178,7 +178,8 @@ void OutResult::OutParameterSingletone(sep::Parameter par,
 // prepare parameters to be printed out
 void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
-  int z_layer = PARAMETERS->GetUseZAxis() ? 5 : 0;
+  int z_layer = SOLVER->grid()->size()[sep::Z]/2;
+  z_layer = PARAMETERS->GetUseZAxis() ? z_layer : 0;
 
   // clean up previous results
   parameters_[gas_numb].clear();

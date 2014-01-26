@@ -6,6 +6,8 @@
 #include <string.h>
 #include <vector>
 
+using namespace std;
+
 namespace sep {
   enum Axis {
     X = 0,
