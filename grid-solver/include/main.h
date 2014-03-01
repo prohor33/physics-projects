@@ -33,7 +33,8 @@ namespace sep { // my separator namespace
 
   enum Parameter {
     T = 0,
-    n = 1
+    n,
+    Flow
   };
 
   enum SpeedType {

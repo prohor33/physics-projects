@@ -3,13 +3,15 @@
 #include "grid.h"
 #include "cell.h"
 #include "parameters.h"
+#include "flow_keeper.h"
 #include <stdlib.h>
 
 
 void OutResult::OutParameters(sep::GasNumb gas_numb) {
 
   OutParameter(sep::T, gas_numb);
-  //OutParameter(sep::n, gas_numb);
+  OutParameter(sep::n, gas_numb);
+  OutParameter(sep::Flow, gas_numb);
 }
 
 
@@ -37,9 +39,12 @@ void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
   case sep::n:
     par_str = string("n");
     break;
+  case sep::Flow:
+    par_str = string("Flow");
+    break;
   }
 
-  filename_str = string("result_" + par_str + "_gas_" +
+  filename_str = string("../output/result_" + par_str + "_gas_" +
       sep::int_to_string(gas_numb) + ".dat");
 
   int rank, size;
@@ -72,7 +77,18 @@ void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
 
   }
 
-  int par_size = sizeof(int)*3 + sizeof(double);
+  int par_q;
+  switch (par) {
+    case sep::T:
+    case sep::n:
+      par_q = 1;
+      break;
+    case sep::Flow:
+      par_q = 3;
+      break;
+  }
+
+  int par_size = sizeof(int)*3 + sizeof(double)*par_q;
 
   MPI_Offset offset = par_size * start_p;
   MPI_File file;
@@ -95,19 +111,21 @@ void OutResult::OutParameterMPI(sep::Parameter par, sep::GasNumb gas_numb) {
 
       CellParameters& cell_par = *cii;
 
-      double par_v;
+      double rank_d = rank;
+      MPI_File_write(file, &cell_par.coord[0], 3, MPI_INT, &status);
+
       switch (par) {
         case sep::T:
-          par_v = cell_par.T;
+          MPI_File_write(file, &cell_par.T, 1, MPI_DOUBLE, &status);
           break;
         case sep::n:
-          par_v = cell_par.n;
+          MPI_File_write(file, &cell_par.n, 1, MPI_DOUBLE, &status);
+          break;
+        case sep::Flow:
+          MPI_File_write(file, &cell_par.u[0], 3, MPI_DOUBLE, &status);
           break;
       }
 
-      double rank_d = rank;
-      MPI_File_write(file, &cell_par.coord[0], 3, MPI_INT, &status);
-      MPI_File_write(file, &par_v, 1, MPI_DOUBLE, &status);
     }
     break;
   }
@@ -135,11 +153,15 @@ void OutResult::OutParameterSingletone(sep::Parameter par,
     case sep::n:
       par_str= string("n");
       break;
-  }
+    case sep::Flow:
+     cout << "error: Flow doen't supported for txt file (singletone\
+   case)" << endl;
+     return;
+ }
 
-  out_par_file.open((string("test_") + par_str + string("_gas") +
+  out_par_file.open((string("../output/result_") + par_str + string("_gas") +
       sep::int_to_string(gas_numb) +
-        ".result").c_str());
+        ".txt").c_str());
 
   switch (output_type_) {
 
@@ -158,6 +180,10 @@ void OutResult::OutParameterSingletone(sep::Parameter par,
           case sep::n:
             par_v = (*cii).n;
             break;
+          case sep::Flow:
+            cout << "error: Flow doen't supported for txt file (singletone\
+          case)" << endl;
+            return;
         }
 
         out_par_file << (*cii).coord[sep::X] << " " <<
@@ -191,6 +217,7 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
   const vector<int>& size = SOLVER->grid()->size();
   const vector<int>& start = SOLVER->grid()->start();
   vector<int> actual_cell_c(3);
+  vector<double> u(3);
 
   for(int i=0; i<size[sep::X]; i++) {
     for(int j=0; j<size[sep::Y]; j++) {
@@ -207,23 +234,27 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         actual_cell_c[sep::Y] += start[sep::Y];
         actual_cell_c[sep::Z] += start[sep::Z];
 
+        u[sep::X] = 100.0;
+        u[sep::Y] = 100.0;
+        u[sep::Z] = 100.0;
+
         if (cell->obtained())
           continue;
 
         if (cell->type() != sep::NORMAL) {
 
           parameters_[gas_numb].push_back(
-            CellParameters(actual_cell_c, 0.0, 0.0));
+            CellParameters(actual_cell_c, 0.0, 0.0, u));
 
           continue;
         }
 
         // process T
         double n = 0.0;
-        double u_x = 0.0;
-        double u_y = 0.0;
-        double u_z = 0.0;
         double T = 0.0;
+        u[sep::X] = 0.0;
+        u[sep::Y] = 0.0;
+        u[sep::Z] = 0.0;
 
         // process constants
         for (cii=cell->speed_.begin();
@@ -234,18 +265,18 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
           n += cell->speed(coord);
 
-          u_x += cell->speed(coord) *
+          u[sep::X] += cell->speed(coord) *
               cell->P(sep::X, coord) / cell->MolMass();
 
-          u_y += cell->speed(coord) *
+          u[sep::Y] += cell->speed(coord) *
               cell->P(sep::Y, coord) / cell->MolMass();
 
-          u_z += cell->speed(coord) *
+          u[sep::Z] += cell->speed(coord) *
               cell->P(sep::Z, coord) / cell->MolMass();
         }
 
         // normalize
-        u_x /= n; u_y /= n; u_z /= n;
+        u[sep::X] /= n; u[sep::Y] /= n; u[sep::Z] /= n;
 
         for (cii=cell->speed_.begin();
           cii!=cell->speed_.end(); ++cii) {
@@ -255,11 +286,11 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
 
           T += cell->MolMass() *
               (sep::sqr(cell->P(sep::X, coord) /
-                        cell->MolMass() - u_x)+
+                        cell->MolMass() - u[sep::X])+
               sep::sqr(cell->P(sep::Y, coord) /
-                cell->MolMass() - u_y)+
+                cell->MolMass() - u[sep::Y])+
               sep::sqr(cell->P(sep::Z, coord) /
-                cell->MolMass() - u_z)) *
+                cell->MolMass() - u[sep::Z])) *
               cell->speed(coord);
         }
 
@@ -268,7 +299,7 @@ void OutResult::ProcessParameters(sep::GasNumb gas_numb) {
         T /= 3;
 
         parameters_[gas_numb].push_back(
-            CellParameters(actual_cell_c, T, n));
+            CellParameters(actual_cell_c, T, n, u));
       }
     }
   }
@@ -323,4 +354,27 @@ void OutResult::CheckMassConservation(sep::GasNumb gas_numb) {
   }
   else
     whole_mass_ = whole_mass;
+}
+
+void OutResult::OutPermanentParameters() {
+
+  int rank = PARAMETERS->GetProcessID();
+
+  if (PARAMETERS->GetUseFlowKeeper()) {
+    if (FLOW_KEEPER->areas().size() < 2)
+      return;
+
+    static ofstream out_f[2];
+
+    for (int i=0; i<2; i++) {
+      FlowAreaData* area = FLOW_KEEPER->areas()[i];
+      // TODO: rewrite this "code"
+      if (!out_f[i].is_open()) {
+        out_f[i].open(string("../output/cons_in_area_") +
+            sep::int_to_string(rank*2+i) +
+            string(".txt").c_str());
+      }
+      out_f[i] << area->consumption << endl;
+    }
+  }
 }

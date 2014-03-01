@@ -4,7 +4,17 @@ from pylab import *
 import mpl_toolkits.mplot3d.axes3d as p3
 import struct
 
-fin = open("result_T_gas_0.dat", "rb")
+from os import listdir
+from os.path import isfile, join
+
+mypath = "../output/"
+only_n_T_files = [ f for f in listdir(mypath) \
+  if isfile(join(mypath,f)) and f.find("_n_")!=-1]
+
+#for now it's build only one plot
+result_filename = only_n_T_files[0]
+
+fin = open(mypath + result_filename, "rb")
 
 dt = np.dtype([('x','i'),('y','i'),('z','i'),('value','d')])
 
@@ -64,9 +74,11 @@ cb = fig.colorbar(p, ax=ax)
 
 plt.title("Temperature")
 
-#plt.savefig("mpi_plot.png")
+img_name = result_filename.replace(".dat", ".png")
 
-plt.show()
+plt.savefig("../img/"+img_name)
+
+#plt.show()
 
 plt.close()
 

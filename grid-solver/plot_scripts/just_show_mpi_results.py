@@ -2,7 +2,7 @@
 
 import struct
 
-fin = open("final.dat", "rb")
+fin = open("../output/result_T_gas_0.dat", "rb")
 
 i = fin.read(4)
 count = 0

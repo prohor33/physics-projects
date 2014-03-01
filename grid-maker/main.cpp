@@ -5,6 +5,7 @@ int main(int argc, char* argv[]) {
 
   bool flag_output_to_this_dir = false;
   int grid_config = -1;
+  bool flat_z = false;
 
   for (int i=1; i<argc; i++) {
     string arg = string(argv[i]);
@@ -27,8 +28,10 @@ int main(int argc, char* argv[]) {
       i++;
       arg = string(argv[i]);
       grid_config = stoi(arg);
-      } else if (arg == "-td") {
+    } else if (arg == "-td") {
       flag_output_to_this_dir = true;
+    } else if (arg == "-flat") {
+      flat_z = true;
     }
   }
 
@@ -40,12 +43,12 @@ int main(int argc, char* argv[]) {
   }
 
   //GRID_MAKER->BuildCubeGrid();
-  GRID_MAKER->BuildOurMainGrid(grid_config);
+  GRID_MAKER->BuildOurMainGrid(grid_config, flat_z);
 
   string grid_name;
 
   if (!flag_output_to_this_dir) {
-    grid_name += "../grid-solver/";
+    grid_name += "../config/";
   }
   grid_name += "income.grid";
 

@@ -5,11 +5,6 @@ using namespace std;
 // Initialize empty grid
 void GridMaker::FillInGridWithNulls(int n, int m, int p) {
 
-  grid_config_ = new GridConfig();
-  grid_config_->size[sep::X] = n;
-  grid_config_->size[sep::Y] = m;
-  grid_config_->size[sep::Z] = p;
-
   for (int i=0; i<n; i++) {
 
     vector<vector<CellInitData*> > vec_yz;
@@ -132,9 +127,17 @@ void GridMaker::OutToFile(std::string file_name) {
 
 // Add box with fake cells around it
 void GridMaker::AddBox(vector<int> start, vector<int> size,
-   double T_start, vector<bool> without_fakes) {
+   double T_start, vector<bool> without_fakes, bool flat_z) {
 
   int n, m, p;
+
+  // add 2D case
+  if (flat_z) {
+    start[sep::Z] = 0;
+    size[sep::Z] = 1;
+    without_fakes[sep::Z] = true;
+  }
+
   n = start[sep::X] + size[sep::X];
   m = start[sep::Y] + size[sep::Y];
   p = start[sep::Z] + size[sep::Z];
@@ -195,7 +198,7 @@ void GridMaker::AddBox(vector<int> start, vector<int> size,
 
 
 // Build H type grid
-void GridMaker::BuildOurMainGrid(int grid_option) {
+void GridMaker::BuildOurMainGrid(int grid_option, bool flat_z) {
 
   int n, m, p, D, l, d, h;
   int gaps_q;
@@ -210,7 +213,7 @@ void GridMaker::BuildOurMainGrid(int grid_option) {
     l = m - 2*D;
     d = 4;
     h = 3;
-    gaps_q = 5;
+    gaps_q = 3;
     break;
   case 1:
     n = 70;
@@ -236,6 +239,20 @@ void GridMaker::BuildOurMainGrid(int grid_option) {
     break;
   }
 
+  // Add 2D case
+  if (flat_z) {
+    p = 1;
+  }
+
+  int x_space = (n - ((gaps_q - 1)*(d + h) + d))/2;
+
+  // Fill in config info
+
+  grid_config_->size[sep::X] = n;
+  grid_config_->size[sep::Y] = m;
+  grid_config_->size[sep::Z] = p;
+  grid_config_->D = D;
+  grid_config_->indent = x_space/2;
 
   FillInGridWithNulls(n, m, p);
 
@@ -257,7 +274,7 @@ void GridMaker::BuildOurMainGrid(int grid_option) {
   size[sep::Y] = D;
   size[sep::Z] = D;
 
-  AddBox(start, size, 1.0, without_fakes);
+  AddBox(start, size, 1.0, without_fakes, flat_z);
 
   // Add second box
 
@@ -273,15 +290,13 @@ void GridMaker::BuildOurMainGrid(int grid_option) {
   size[sep::Y] = D;
   size[sep::Z] = D;
 
-  AddBox(start, size, 0.8, without_fakes);
+  AddBox(start, size, 0.8, without_fakes, flat_z);
 
   // Add gaps boxes
 
   without_fakes[sep::X] = false;
   without_fakes[sep::Y] = true;
   without_fakes[sep::Z] = false;
-
-  int x_space = (n - ((gaps_q - 1)*(d + h) + d))/2;
 
   for (int i=0; i<gaps_q; i++) {
 
@@ -293,6 +308,6 @@ void GridMaker::BuildOurMainGrid(int grid_option) {
     size[sep::Y] = l + 4; // +4 because of fake cells
     size[sep::Z] = d + 2; // +2 because of fake cells
 
-    AddBox(start, size, 0.9, without_fakes);
+    AddBox(start, size, 0.9, without_fakes, flat_z);
   }
 }

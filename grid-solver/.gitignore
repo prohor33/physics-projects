@@ -1,12 +1,8 @@
-# binary
-grid-solver
-
-# result files
-*.result
-*.dat
-
-# result directory
-test_results/*
-
-# log directory
+# some directories
+bin/*
+config/*
+img/*
 logs/*
+output/*
+test_results/*
+usage/*

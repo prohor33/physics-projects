@@ -6,12 +6,15 @@ find_package(MPI REQUIRED)
 
 include_directories(${MPI_INCLUDE_PATH})
 
+include_directories("../include")
+
 SET(SOURCES
         main.cpp
         ci.cpp
         cell.cpp
         grid_file_reader.cpp
         grid.cpp
+        flow_keeper.cpp
         integral.cpp
         manager.cpp
         out_result.cpp
@@ -20,6 +23,8 @@ SET(SOURCES
         solver.cpp
         test.cpp
         )
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../bin/")
 
 ADD_EXECUTABLE(grid-solver ${SOURCES})
 

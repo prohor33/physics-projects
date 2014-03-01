@@ -51,7 +51,7 @@ void Integral::Iteration() {
 
   // 1<->1
   {
-    Generate(PARAMETERS->time_step(), m1, m1, particle, particle);
+    Generate(PARAMETERS->time_step()*100, m1, m1, particle, particle);
 
     for(int i=0; i<size[sep::X]; i++) {
       for(int j=0; j<size[sep::Y]; j++) {
@@ -150,8 +150,10 @@ void Integral::FillInput(Cell* cell_gas1, Cell* cell_gas2) {
     int z = coord[sep::Z];
 
     input_for_ci1[xyz2i[x][y][z]] = (*cii);
-    if (cell2)
-      input_for_ci2[xyz2i[x][y][z]] = cell2->speed()[cii-cell1->speed().begin()];
+    if (cell2) {
+      input_for_ci2[xyz2i[x][y][z]] =
+        cell2->speed()[cii-cell1->speed().begin()];
+    }
   }
 }
 
@@ -187,8 +189,10 @@ void Integral::GetInput(Cell* cell_gas1, Cell* cell_gas2) {
 
     (*cii) = input_for_ci1[xyz2i[x][y][z]];
 
-    if (cell2)
-      cell2->speed()[cii-cell1->speed().begin()] = input_for_ci2[xyz2i[x][y][z]];
+    if (cell2) {
+      cell2->speed()[cii-cell1->speed().begin()] =
+        input_for_ci2[xyz2i[x][y][z]];
+    }
   }
 }
 

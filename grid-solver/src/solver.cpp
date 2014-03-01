@@ -3,6 +3,7 @@
 #include "parameters.h"
 #include "integral.h"
 #include "parallel.h"
+#include "flow_keeper.h"
 
 string sep::int_to_string(int i) {
 
@@ -32,6 +33,7 @@ void Solver::Compute() {
 
     ComputeIteration(1.0); // like_a_tau = 1.0, because of time_step = 0.02smth
 
+    OUT_RESULT->OutPermanentParameters();
     PARAMETERS->OutTime();
     cout << "Iteration " << i << " done." << endl;
   }
@@ -62,15 +64,11 @@ void Solver::ComputeIteration(double dt) {
   if (PARAMETERS->GetUseZAxis())
     MakeStep(sep::Z, dt);
 
-  if (PARAMETERS->GetUseCollisionIntegral()) {
-
-    if (!PARAMETERS->GetSecondGasIsActive()) {
-      cout << "Error: no second gas, but integral." << endl;
-      exit(-1);
-    }
-
+  if (PARAMETERS->GetUseCollisionIntegral())
     INTEGRAL->Iteration();
-  }
+
+  if (PARAMETERS->GetUseFlowKeeper())
+    FLOW_KEEPER->SetFlow();
 }
 
 

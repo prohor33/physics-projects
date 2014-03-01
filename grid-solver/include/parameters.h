@@ -140,6 +140,33 @@ class Parameters {
     return iteration_q_;
   }
 
+  void SetUseFlowKeeper(bool x) {
+    use_flow_keeper_ = x;
+  }
+  bool GetUseFlowKeeper() {
+    return use_flow_keeper_;
+  }
+
+  void SetUseStartTemperature(bool x) {
+    use_start_temperature_ = x;
+  }
+  bool GetUseStartTemperature() {
+    return use_start_temperature_;
+  }
+
+  void SetT1T2(double T1, double T2) {
+    T1_ = T1; T2_ = T2;
+  }
+  double GetT1() const { return T1_; }
+  double GetT2() const { return T2_; }
+
+  void SetStartFlow(double x) {
+    start_flow_ = x;
+  }
+  double GetStartFlow() {
+    return start_flow_;
+  }
+
   void OutTime();
 protected:
 
@@ -157,24 +184,20 @@ protected:
 
   bool second_gas_is_active_; // second gas flag
 
-  // TODO: that's can't be right
-  //map<int, vector<int> > s_coord_map_1d_to_3d_;
   vector<vector<int> > s_coord_map_1d_to_3d_;
   map<vector<int>, int> s_coord_map_3d_to_1d_;
 
   bool use_checking_mass_conservation_;
-
   bool use_z_axis_;
-
   bool use_parallel_computing_;
-
   bool use_grid_from_input_file_;
-
   bool use_collision_integral_;
-
+  bool use_flow_keeper_;
+  bool use_start_temperature_;
   int speed_quantity_;
-
   double p_cut_;
+  double T1_, T2_;
+  double start_flow_;
 
   vector<double> gamma_;
 

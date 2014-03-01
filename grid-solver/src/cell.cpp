@@ -16,7 +16,9 @@ CellNeighbor::CellNeighbor(
     prev = NULL;
 };
 
-Cell::Cell(sep::GasNumb gas_numb, sep::CellType type) :
+Cell::Cell(sep::GasNumb gas_numb, sep::CellType type,
+    double T_start, sep::Axis flow_axis,
+    double p_flow) :
     gas_numb_(gas_numb),
     type_(type),
     obtained_(false)
@@ -30,18 +32,18 @@ Cell::Cell(sep::GasNumb gas_numb, sep::CellType type) :
     return;
 
   double n = 1.0;
-  double T_start = 1.0;
   double C = 0;
   double p2;
+  double m = MolMass();
 
   // process C
   for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
 
     coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
-    p2 = P2(coord);
+    p2 = P2_with_flow(coord, flow_axis, p_flow);
 
     C += exp((-1.0f)*
-        p2 / (2.0f * MolMass() * T_start));
+        p2 / (2.0f * m * T_start));
   }
 
   /* n0 = 1.0 */
@@ -50,10 +52,10 @@ Cell::Cell(sep::GasNumb gas_numb, sep::CellType type) :
   for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
 
     coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
-    p2 = P2(coord);
+    p2 = P2_with_flow(coord, flow_axis, p_flow);
 
     speed_.push_back(n * C * exp((-1.0f)*
-        p2 / (2.0f * MolMass() * T_start)));
+        p2 / (2.0f * m * T_start)));
   }
 
   // initialize speed_half array
@@ -89,6 +91,20 @@ double Cell::P2(vector<int> coord) const {
   return (sep::sqr(PARAMETERS->velocity_[coord[sep::X]]) +
       sep::sqr(PARAMETERS->velocity_[coord[sep::Y]]) +
       sep::sqr(PARAMETERS->velocity_[coord[sep::Z]])) *
+      sep::sqr(MolMass());
+}
+
+double Cell::P2_with_flow(const vector<int>& coord,
+    sep::Axis axis, double p_flow) const {
+
+  vector<double> v_flow(3);
+
+  for (int ax=sep::X; ax<=sep::Z; ax++)
+    v_flow[ax] = axis == ax ? p_flow / MolMass() : 0.0f;
+
+  return (sep::sqr(PARAMETERS->velocity_[coord[sep::X]]-v_flow[sep::X]) +
+      sep::sqr(PARAMETERS->velocity_[coord[sep::Y]]-v_flow[sep::Y]) +
+      sep::sqr(PARAMETERS->velocity_[coord[sep::Z]]-v_flow[sep::Z])) *
       sep::sqr(MolMass());
 }
 

@@ -13,10 +13,14 @@ Parameters::Parameters() :
   use_parallel_computing_(false),
   use_grid_from_input_file_(false),
   use_collision_integral_(false),
+  use_flow_keeper_(false),
   speed_quantity_(false),
   p_cut_(0),
   cout_backup_buf_(NULL),
-  log_type_(sep::LogType(-1))
+  log_type_(sep::LogType(-1)),
+  T1_(0.0),
+  T2_(0.0),
+  start_flow_(0.0)
 {};
 
 
@@ -70,7 +74,7 @@ void Parameters::SetLogType(sep::LogType ltype) {
     time_t t = time(0);
     struct tm * now = localtime( & t );
 
-    log_filename << "logs/"
+    log_filename << "../logs/"
     <<  now->tm_mday << '-'
     << (now->tm_mon + 1) << '-'
     << (now->tm_year + 1900) << '_'

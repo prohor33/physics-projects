@@ -11,7 +11,8 @@ class GridConfig {
   ~GridConfig() {};
 
   int size[3]; // x, y and z axis
-
+  int D;
+  int indent;
 };
 
 class GridDataSplitter {

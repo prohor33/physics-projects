@@ -10,7 +10,7 @@ public:
 	EdgeCondition( Cell*** Cells, int gas_index ){
 		this->Cells = Cells;
 		this->gas_index = gas_index;
-		edgecond_slash_from_edge = 5;		
+		edgecond_slash_from_edge = 5;
 	};
 	bool FillEdgeConditionAreas( void );
 	bool FillEdgeAreas( void );

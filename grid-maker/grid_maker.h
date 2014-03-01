@@ -11,6 +11,8 @@ class GridConfig {
   ~GridConfig() {};
 
   int size[3]; // x, y and z axis
+  int D;
+  int indent;
 
 };
 
@@ -71,17 +73,22 @@ class GridMaker {
 
   void BuildCubeGrid();
 
-  void BuildOurMainGrid(int grid_option);
+  void BuildOurMainGrid(int grid_option, bool flat_z);
 
   void OutToFile(std::string file_name);
 
   void AddBox(std::vector<int> start, std::vector<int> size,
-      double T_start, std::vector<bool> without_fakes);
+      double T_start, std::vector<bool> without_fakes,
+      bool flat_z = false);
 
  private:
 
-  GridMaker() {};
-  ~GridMaker() {};
+  GridMaker() {
+    grid_config_ = new GridConfig();
+  };
+  ~GridMaker() {
+    delete grid_config_;
+  };
 
   std::vector<std::vector<std::vector<CellInitData*> > > cells_;
 

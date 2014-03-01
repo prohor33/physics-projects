@@ -6,7 +6,7 @@
 #include "out_result.h"
 #include "grid_file_reader.h"
 #include "parallel.h"
-
+#include "flow_keeper.h"
 
 void Manager::Initialize(int argc, char *argv[]) {
 
@@ -17,6 +17,10 @@ void Manager::Initialize(int argc, char *argv[]) {
   PARALLEL->InitializeMPI(argc, argv);
 
   InitializeSolver();
+
+  // must be after solver initialization
+  if (PARAMETERS->GetUseFlowKeeper())
+    FLOW_KEEPER->InitFlowAreas();
 
   cout << "Initialization complete" << endl;
 }

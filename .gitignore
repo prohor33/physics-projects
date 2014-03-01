@@ -14,13 +14,6 @@
 *.la
 *.a
 
-# Eclipse project files
-.classpath
-.project
-.cproject
-.settings/
-project.properties
-
 # CMake
 CMakeFiles
 Makefile
@@ -29,11 +22,6 @@ cmake_install.cmake
 install_manifest.txt
 
 # Directories wich shouldn't be tracked by Git
-mpi-example/
+code_compiled_on_server/
+server_scripts/
 
-# Grid config files
-*.grid
-
-# some bash scripts
-copy_to_server*
-connect_to_server*

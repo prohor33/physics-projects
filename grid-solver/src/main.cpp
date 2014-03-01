@@ -13,21 +13,24 @@ int main(int argc, char *argv[]) {
   PARAMETERS->SetTimeStep(0.02/4.8);
   PARAMETERS->SetSpeedQuantity(16); // for debug (should be 20)
   PARAMETERS->SetPCut(4.8);
+  PARAMETERS->SetT1T2(1.0, 0.8);
+  PARAMETERS->SetStartFlow(0.1);
 
-  PARAMETERS->SetInputGridFilename("income.grid");
+  PARAMETERS->SetInputGridFilename("../config/income.grid");
 
   // without second gas for a while
   PARAMETERS->SetSecondGasIsActive(false);
 
-  PARAMETERS->SetUseCheckingMassConservation(false); // delta is 1e-13 now
-
-  PARAMETERS->SetUseZAxis(true);
-
+  PARAMETERS->SetUseCheckingMassConservation(true); // delta is 1e-13 now
+  PARAMETERS->SetUseZAxis(false);
   PARAMETERS->SetGridFromInputFile(true);
+  PARAMETERS->SetUseStartTemperature(true);
+  PARAMETERS->SetUseFlowKeeper(false);
 
   PARAMETERS->SetUseCollisionIntegral(false);
 
-  PARAMETERS->SetLogType(sep::LOG_FILE);
+  //PARAMETERS->SetLogType(sep::LOG_FILE);
+  PARAMETERS->SetLogType(sep::CONSOLE);
 
   PARAMETERS->SetIterationQ(1);
 
@@ -40,10 +43,7 @@ int main(int argc, char *argv[]) {
 
   SOLVER->Compute();
 
-  //OUT_RESULT->ProcessParameters(sep::FIRST);
-  //OUT_RESULT->OutParameters(sep::FIRST);
-
-  // TODO: should translate this ti SOLVER->Finalize() o smt like that
+  // TODO: should translate this to SOLVER->Finalize() or smth like that
   PARALLEL->FinalizeMPI();
 
   return 0;

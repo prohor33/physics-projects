@@ -25,8 +25,9 @@ class Cell {
 
  public:
 
-  Cell(sep::GasNumb gas_numb, sep::CellType type=sep::NORMAL);
-
+  Cell(sep::GasNumb gas_numb, sep::CellType type,
+      double T_start=0.0f, sep::Axis flow_axis=sep::X,
+      double p_flow=0.0f);
   ~Cell() {};
 
   void ComputeHalfSpeed(sep::Axis axis,
@@ -60,6 +61,9 @@ class Cell {
       vector<int> coord) const;
 
   inline double P2(vector<int> coord) const;
+
+  double P2_with_flow(const vector<int>& coord,
+    sep::Axis axis, double p_flow) const;
 
   inline double Limiter(sep::Axis& axis,
       vector<int>& coord);

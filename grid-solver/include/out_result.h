@@ -13,18 +13,22 @@ public:
   CellParameters(
       vector<int> coord,
       double T,
-      double n
+      double n,
+      vector<double> u
       ) :
       coord(coord),
       T(T),
       n(n)
-      {};
+      {
+        this->u = u;
+      };
 
   ~CellParameters() {};
 
   vector<int> coord;
   double T;
   double n;
+  vector<double> u;
 };
 
 class OutResult {
@@ -52,6 +56,8 @@ class OutResult {
   }
 
   void CheckMassConservation(sep::GasNumb gas_numb);
+
+  void OutPermanentParameters();
 
  private:
 
