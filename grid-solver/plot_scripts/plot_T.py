@@ -33,7 +33,7 @@ for i in range(0, data.size):
 size_x += 1
 size_y += 1
 
-print 'grid size: ', size_x, size_y
+#print 'grid size: ', size_x, size_y
 
 X = np.zeros(shape = (size_x, size_y))
 Y = np.zeros(shape = (size_x, size_y))

@@ -158,9 +158,11 @@ void GridMaker::AddBox(vector<int> start, vector<int> size,
 
         if (i == start[sep::X] || i == n-1 ||
             j == start[sep::Y] || j == m-1 ||
-            k == start[sep::Z] || k == p-1) {
+            ((k == start[sep::Z] || k == p-1) &&
+             !flat_z /* not to skip the first row */)) {
           // fake cells
 
+          // it's not the repeat of condition, it's logically right
           if (((i == start[sep::X] || i == n-1) && !without_fakes[sep::X]) ||
               ((j == start[sep::Y] || j == m-1) && !without_fakes[sep::Y]) ||
               ((k == start[sep::Z] || k == p-1) && !without_fakes[sep::Z])) {
@@ -171,7 +173,6 @@ void GridMaker::AddBox(vector<int> start, vector<int> size,
         }
         else {
           // normal cells
-
           cell = new CellInitData(CellInitData::CIDT_NORMAL);
 
           if (i == start[sep::X]+1 || i == n-2 ||
@@ -243,6 +244,12 @@ void GridMaker::BuildOurMainGrid(int grid_option, bool flat_z) {
   if (flat_z) {
     p = 1;
   }
+
+  cout << "Generating ";
+  if (flat_z)
+    cout << "2D ";
+  cout << n << " x " << m << " x " << p <<
+    " grid..." << endl;
 
   int x_space = (n - ((gaps_q - 1)*(d + h) + d))/2;
 

@@ -131,10 +131,14 @@ void Grid::InitGasCells(
 
         case CellInitData::CIDT_NORMAL:
         case CellInitData::CIDT_FAKE:
-
+          // debug
+          // creating only fake cells!
+          cout << "Normal cell is created" << endl;
           if (gfr_cell->type ==
-              CellInitData::CIDT_NORMAL)
+              CellInitData::CIDT_NORMAL) {
+            cout << "Normal cell is created" << endl;
             cell = new Cell(gas_numb, sep::NORMAL, T, flow_axis, p_flow);
+          }
           else
             cell = new Cell(gas_numb, sep::FAKE, T, flow_axis, p_flow);
 

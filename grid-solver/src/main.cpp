@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   //PARAMETERS->SetLogType(sep::LOG_FILE);
   PARAMETERS->SetLogType(sep::CONSOLE);
 
-  PARAMETERS->SetIterationQ(1);
+  PARAMETERS->SetIterationQ(10);
 
   // output type will changed wether singletone mode is active
   OUT_RESULT->SetOutputType(sep::OUT_BINARY_FILE);

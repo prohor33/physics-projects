@@ -36,7 +36,7 @@ gas_index = 1;
 
 GridSize_x = 35
 GridSize_y = 25
-print "Grid:", GridSize_x, GridSize_y
+#print "Grid:", GridSize_x, GridSize_y
 
 FLAG_use_contour = 1
 FLAG_use_interpolation = 1
@@ -199,7 +199,7 @@ output_file_name = "%s%s%i.png" % ("result " + str(gas_index) + "/Concentration/
                                    start_file_name, quantity_of_files)
 #plt.savefig(output_file_name)
 plt.savefig('../img/T.png')
-print 100/4*float(quantity_of_files)/end_quantity_of_files, "%"
+#print 100/4*float(quantity_of_files)/end_quantity_of_files, "%"
 quantity_of_files = quantity_of_files + 1
                                    
 plt.close()
