@@ -15,6 +15,13 @@ using namespace std;
 
 namespace sep { // my separator namespace
 
+  enum EdgePos {
+    UP_LEFT = 0,
+    UP_RIGHT,
+    DOWN_LEFT,
+    DOWN_RIGHT
+  };
+
   enum LogType {
     CONSOLE = 0,
     LOG_FILE = 1

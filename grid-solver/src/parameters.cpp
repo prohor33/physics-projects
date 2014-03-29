@@ -1,4 +1,6 @@
 #include "parameters.h"
+#include "solver.h"
+#include "grid_file_reader.h"
 
 Parameters::Parameters() :
   mol_mass_gas1_(-1.0),
@@ -101,3 +103,16 @@ void Parameters::OutTime() {
     << now->tm_sec
     << " : ";
 }
+
+const vector<int>& Parameters::GetGridSize() {
+  return SOLVER->grid()->start();
+}
+vector<int> Parameters::GetWholeGridSize() {
+  // TODO: stupid
+  int* a = GRID_FILE_READER->grid_config()->size;
+  vector<int> b;
+  for (int i=0; i<3; i++)
+    b.push_back(a[i]);
+  return b;
+}
+

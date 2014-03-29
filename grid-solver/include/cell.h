@@ -27,7 +27,7 @@ class Cell {
 
   Cell(sep::GasNumb gas_numb, sep::CellType type,
       double T_start=0.0f, sep::Axis flow_axis=sep::X,
-      double p_flow=0.0f);
+      double p_flow=0.0f, double n=1.0f);
   ~Cell() {};
 
   void ComputeHalfSpeed(sep::Axis axis,

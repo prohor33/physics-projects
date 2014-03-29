@@ -36,7 +36,7 @@ void FlowKeeper::InitFlowAreas() {
   // TODO: this works only if mpi split in X axis
   if (coord[sep::X] > grid_start[sep::X] &&
       coord[sep::X] + size[sep::X] < grid_start[sep::X] + grid_size[sep::X])
-    areas_.push_back(new FlowAreaData(coord, size, indent));
+    areas_.push_back(new FlowAreaData(coord, size, indent, sep::UP_LEFT));
 
   // right up
 
@@ -48,7 +48,7 @@ void FlowKeeper::InitFlowAreas() {
 
   if (coord[sep::X] > grid_start[sep::X] &&
       coord[sep::X] + size[sep::X] < grid_start[sep::X] + grid_size[sep::X])
-    areas_.push_back(new FlowAreaData(coord, size, indent));
+    areas_.push_back(new FlowAreaData(coord, size, indent, sep::UP_RIGHT));
 
   // left down
 
@@ -60,7 +60,7 @@ void FlowKeeper::InitFlowAreas() {
 
   if (coord[sep::X] > grid_start[sep::X] &&
       coord[sep::X] + size[sep::X] < grid_start[sep::X] + grid_size[sep::X])
-    areas_.push_back(new FlowAreaData(coord, size, indent));
+    areas_.push_back(new FlowAreaData(coord, size, indent, sep::DOWN_LEFT));
 
   // right down
 
@@ -72,7 +72,7 @@ void FlowKeeper::InitFlowAreas() {
 
   if (coord[sep::X] > grid_start[sep::X] &&
       coord[sep::X] + size[sep::X] < grid_start[sep::X] + grid_size[sep::X])
-    areas_.push_back(new FlowAreaData(coord, size, indent));
+    areas_.push_back(new FlowAreaData(coord, size, indent, sep::DOWN_RIGHT));
 }
 
 
@@ -136,10 +136,11 @@ void FlowKeeper::SetCellFlow(FlowAreaData& area,
   double C = 0.0;
   // TODO: Hack
   //area.indent_consumption = 6.0;
-  double p_flow = 1.0 * p_coef * m * area.indent_consumption;
+  //double p_flow = 1.0 * p_coef * m * area.indent_consumption;
+  double p_flow = 0.0;
   double T1 = PARAMETERS->GetT1();
   double T2 = PARAMETERS->GetT2();
-  double n = 0.0f;
+  double n_result = 0.0f;
   double T_flow;
 
   if (area.coord[sep::Y] < SOLVER->grid()->size()[sep::Y]/2)
@@ -159,8 +160,9 @@ void FlowKeeper::SetCellFlow(FlowAreaData& area,
         p2 / (2.0f * m * T_flow));
   }
 
-  // n0 = 1.0f
-  C = 1.0f / C;
+  double n = 1.0f;
+  n = PARAMETERS->GetConcentration(area.pos);
+  C = n / C;
 
   for (cii=cell->speed().begin();
     cii!=cell->speed().end(); ++cii) {
@@ -176,9 +178,9 @@ void FlowKeeper::SetCellFlow(FlowAreaData& area,
 
     u_x += (*cii) * p / m;
 
-    n += (*cii);
+    n_result += (*cii);
   }
-  u_x /= n;
+  u_x /= n_result;
   area.consumption += u_x;
 }
 

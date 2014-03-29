@@ -70,13 +70,17 @@ void Grid::InitGasCells(
   start_ = start;
 
   double T1, T2, T, p_flow, p_flow_max;
+  double n1, n2, n3, n4, P; // P - concentration here
   sep::Axis flow_axis = sep::X;
   int D = GRID_FILE_READER->grid_config()->D;
   T1 = PARAMETERS->GetT1();
   T2 = PARAMETERS->GetT2();
   p_flow_max = PARAMETERS->GetStartFlow();
   double mass = PARAMETERS->GetMolMass(gas_numb);
-
+  n1 = PARAMETERS->GetConcentration(0);
+  n2 = PARAMETERS->GetConcentration(1);
+  n3 = PARAMETERS->GetConcentration(2);
+  n4 = PARAMETERS->GetConcentration(3);
   cells = new Cell***[size[sep::X]];
 
   // initialize cells for our gas
@@ -92,13 +96,18 @@ void Grid::InitGasCells(
 
         p_flow = 0.0;
         T = 1.0;
+        double n_up, n_down;
         if (PARAMETERS->GetUseStartTemperature()) {
           // TODO: This is only for x axis splitting with mpi
+//          n_up = n2 + (n1 - n2) * i / 
           if (j > D - 2 && j < m - D + 1) {
             T = T2 + (T1 - T2) * (double)(j - D + 2) / (m - 2*D + 3);
           }
           else {
             T = j < D ? T2 : T1;
+            if (j < D) {
+ //             n = 
+            }
           }
         }
         if (PARAMETERS->GetUseFlowKeeper() &&
@@ -113,7 +122,8 @@ void Grid::InitGasCells(
             y = j - 1;
           }
           double coef = pow(l, 6) / 36.0;
-          p_flow = 6.0 *  mass * y * (l - y) * z * (l - z) / coef;
+          //p_flow = 6.0 *  mass * y * (l - y) * z * (l - z) / coef;
+          p_flow = 0.0;
         }
         CellInitData* gfr_cell = GRID_FILE_READER->
            cells()[start[sep::X]+i][start[sep::Y]+j][start[sep::Z]+k];
@@ -137,10 +147,10 @@ void Grid::InitGasCells(
           if (gfr_cell->type ==
               CellInitData::CIDT_NORMAL) {
             cout << "Normal cell is created" << endl;
-            cell = new Cell(gas_numb, sep::NORMAL, T, flow_axis, p_flow);
+            cell = new Cell(gas_numb, sep::NORMAL, T, flow_axis, p_flow, n);
           }
           else
-            cell = new Cell(gas_numb, sep::FAKE, T, flow_axis, p_flow);
+            cell = new Cell(gas_numb, sep::FAKE, T, flow_axis, p_flow, n);
 
           cell->wall_t()[sep::X] =
             gfr_cell->T_start[sep::X];

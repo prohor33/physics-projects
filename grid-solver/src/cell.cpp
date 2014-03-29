@@ -18,7 +18,7 @@ CellNeighbor::CellNeighbor(
 
 Cell::Cell(sep::GasNumb gas_numb, sep::CellType type,
     double T_start, sep::Axis flow_axis,
-    double p_flow) :
+    double p_flow, double n) :
     gas_numb_(gas_numb),
     type_(type),
     obtained_(false)
@@ -31,7 +31,6 @@ Cell::Cell(sep::GasNumb gas_numb, sep::CellType type,
   if (type_ == sep::NONE)  // empty cell
     return;
 
-  double n = 1.0;
   double C = 0;
   double p2;
   double m = MolMass();
@@ -46,15 +45,14 @@ Cell::Cell(sep::GasNumb gas_numb, sep::CellType type,
         p2 / (2.0f * m * T_start));
   }
 
-  /* n0 = 1.0 */
-  C = 1.0f / C;
+  C = n / C;
 
   for (int i=0; i<PARAMETERS->s_coord_map_1d_to_3d_.size(); i++) {
 
     coord = PARAMETERS->s_coord_map_1d_to_3d_[i];
     p2 = P2_with_flow(coord, flow_axis, p_flow);
 
-    speed_.push_back(n * C * exp((-1.0f)*
+    speed_.push_back(C * exp((-1.0f)*
         p2 / (2.0f * m * T_start)));
   }
 

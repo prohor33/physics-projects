@@ -14,6 +14,10 @@ int main(int argc, char *argv[]) {
   PARAMETERS->SetSpeedQuantity(16); // for debug (should be 20)
   PARAMETERS->SetPCut(4.8);
   PARAMETERS->SetT1T2(1.0, 0.8);
+  // initial conditions,
+  // also this is concentrations for 
+  // border flows
+  PARAMETERS->SetConcentrations(1.2, 1.1, 0.9, 0.8);
   PARAMETERS->SetStartFlow(0.1);
 
   PARAMETERS->SetInputGridFilename("../config/income.grid");

@@ -166,7 +166,16 @@ class Parameters {
   double GetStartFlow() {
     return start_flow_;
   }
-
+  void SetConcentrations(double n1, double n2, double n3,  double n4) {
+    n_[0] = n1; n_[1] = n2; n_[2] = n3; n_[3] = n4;
+  }
+  double GetConcentration(int i) {
+    if (i < 0 || i > 3)
+      return -1.0;
+    return n_[i];
+  }
+  const vector<int>& GetGridSize();
+  vector<int> GetWholeGridSize();
   void OutTime();
 protected:
 
@@ -198,6 +207,7 @@ protected:
   double p_cut_;
   double T1_, T2_;
   double start_flow_;
+  double n_[4];
 
   vector<double> gamma_;
 
